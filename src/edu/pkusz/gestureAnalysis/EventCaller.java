@@ -18,9 +18,13 @@ public class EventCaller {
 		case 1:
 			pcControler.keyPress(KeyEvent.VK_C);break;
 		case 3:
-			pcControler.keyPress(KeyEvent.VK_3);break;
+			pcControler.pageDown();
+			System.out.println("pagedown");
+			break;
 		case 4:
-			pcControler.keyPress(KeyEvent.VK_4);break;
+			pcControler.pageUp();
+			System.out.println("pageup");
+			break;
 		}
 		return true;
 	}

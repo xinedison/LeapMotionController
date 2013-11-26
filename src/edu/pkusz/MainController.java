@@ -6,7 +6,7 @@ import com.leapmotion.leap.Controller;
 
 import edu.pkusz.leapMotion.LMListener;
 
-public class MainController implements Runnable{
+public class MainController{
 	private LMListener listener = null;
 	private Controller controller = null;
 //	private PCControler pcController = null;
@@ -20,22 +20,23 @@ public class MainController implements Runnable{
 		this.controller.removeListener(listener);
 	}
 	public static void main(String[] args){
-		MainController mainController = new MainController();
-        Thread thread = new Thread(mainController);
-        thread.start();
-        System.out.println("Press Enter to quit...");
-        // the main control is in the LMListerner.onFrame()
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // Remove the sample listener when done
-        mainController.removeLister();
+//		MainController mainController = new MainController();
+		LMListener listener = new LMListener();
+		Controller controller = new Controller();
+		controller.addListener(listener);
+		 try {
+	            System.in.read();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+        controller.removeListener(listener);
 	}
 
-	@Override
-	public void run() {
-		
-	}
+//	public void run() {
+//	try {
+//      Thread.sleep(1000);
+//  } catch (Exception e) {
+//      e.printStackTrace();
+//  }
+//	}
 }

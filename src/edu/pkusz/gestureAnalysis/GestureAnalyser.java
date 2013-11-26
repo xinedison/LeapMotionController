@@ -1,6 +1,8 @@
 package edu.pkusz.gestureAnalysis;
 
 
+import java.io.IOException;
+
 import com.leapmotion.leap.CircleGesture;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.FingerList;
@@ -15,9 +17,12 @@ import com.leapmotion.leap.Vector;
 import com.leapmotion.leap.Gesture.State;
 
 import edu.pkusz.PCEvent.PCControler;
+import edu.pkusz.leapMotion.LMListener;
 
 public class GestureAnalyser {
 	private int mode;
+	private int modeNum = 17;
+	private int[] modeIndex = new int[modeNum];
 	/*
 	 * 0:什么也不做
 	 * 1:start show
@@ -41,6 +46,20 @@ public class GestureAnalyser {
 	private Controller controller = null;
 	private PCControler pcController = null;
 	private Vector motionVector = null;
+	
+	public static void main(String[] args){
+//		MainController mainController = new MainController();
+		LMListener listener = new LMListener();
+		Controller controller = new Controller();
+		controller.addListener(listener);
+		 try {
+	            System.in.read();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+        controller.removeListener(listener);
+	}
+	
 	public GestureAnalyser(Controller controller){
 		this.controller = controller;
 		pcController = new PCControler();
@@ -50,6 +69,20 @@ public class GestureAnalyser {
 			e.printStackTrace();
 		}
 		pcController.startShow();
+	}
+	public void clearModeIndex(){	//调用即意味着一次gesture的开始
+		for(int i=0;i<modeNum;i++)
+			modeIndex[i] = 0;		
+	}
+	public int getBestModeIndex(){	//调用以计算一次gesture结束时的最终结果
+		int maxMode = 0;
+		mode = 0;
+		for(int i=0;i<modeNum;i++)
+			if(maxMode<modeIndex[i] ){
+				maxMode=modeIndex[i];
+				mode = i;
+			}
+		return mode;
 	}
 	public void setMode(int mode){
 		this.mode = mode;
@@ -86,6 +119,7 @@ public class GestureAnalyser {
 	 * 四个指头向右，pagedown
 	 */
 	private boolean swipeDirectionDown(Vector endSwipeDirection){
+		System.out.println(endSwipeDirection.getX());
 		if(endSwipeDirection.getX()>0)
 			return true;
 		return false;
@@ -94,55 +128,17 @@ public class GestureAnalyser {
 	 * analyse the gestures leap motion percepted
 	 */
 	private void analyseGesture(GestureList gestures){
+		if(gestures.count() ==0) mode = 0;
 		 for (int i = 0; i < gestures.count(); i++) {
 	            Gesture gesture = gestures.get(i);
 	            switch (gesture.type()) {
-	            //画圈的gesture
-	                case TYPE_CIRCLE:
-	                    CircleGesture circle = new CircleGesture(gesture);
-	                    // Calculate clock direction using the angle between circle normal and pointable
-	                    String clockwiseness;
-	                    if (circle.pointable().direction().angleTo(circle.normal()) <= Math.PI/4) {
-	                        // Clockwise if angle is less than 90 degrees
-	                        clockwiseness = "clockwise";
-	                    } else {
-	                        clockwiseness = "counterclockwise";
-	                    }
-	                    // Calculate angle swept since last frame
-	                    double sweptAngle = 0;
-	                    if (circle.state() != State.STATE_START) {
-	                        CircleGesture previousUpdate = new CircleGesture(controller.frame(1).gesture(circle.id()));
-	                        sweptAngle = (circle.progress() - previousUpdate.progress()) * 2 * Math.PI;
-	                    }
-//	                    System.out.println("Circle id: " + circle.id()  + ", " + circle.state() + ", progress: " + circle.progress()  + ", radius: " + circle.radius() + ", angle: " + Math.toDegrees(sweptAngle) + ", " + clockwiseness);
-	                    if(circle.state()==State.STATE_STOP){
-	                    	System.out.println("draw circle!");
-	                    }
-	                    break;
-	                // 滑动的gesture
 	                case TYPE_SWIPE:
 	                    SwipeGesture swipe = new SwipeGesture(gesture);
-	                    if(swipe.state()==State.STATE_START){
 	                    	if(swipeDirectionDown(swipe.direction())){
-	                    		this.mode = 3;
-//	                    		pcController.pageDown();
+	                    		this.modeIndex[3]++;
 	                    	}else{
-	                    		this.mode = 4;
-//	                    		pcController.pageUp();
+	                    		this.modeIndex[4]++;
 	                    	}
-	                    }
-	                    break;
-	                case TYPE_SCREEN_TAP:
-	                    ScreenTapGesture screenTap = new ScreenTapGesture(gesture);
-	                    System.out.println("Screen Tap id: " + screenTap.id() + ", " + screenTap.state() + ", position: " + screenTap.position() + ", direction: " + screenTap.direction());
-	                    break;
-	                case TYPE_KEY_TAP:
-	                    KeyTapGesture keyTap = new KeyTapGesture(gesture);
-	                    System.out.println("Key Tap id: " + keyTap.id() + ", " + keyTap.state()  + ", position: " + keyTap.position() + ", direction: " + keyTap.direction());
-	                    break;
-	                default:
-	                    System.out.println("Unknown gesture type.");
-	                    break;
 	            }
 	        }
 	}
