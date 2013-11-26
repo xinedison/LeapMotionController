@@ -22,6 +22,7 @@ public class LMListener extends Listener {
 	private EventCaller caller = new EventCaller();
 	//init the controller
     public void onInit(Controller controller) {
+    	controller.setPolicyFlags(Controller.PolicyFlag.POLICY_BACKGROUND_FRAMES);
         System.out.println("Initialized");
     }
     //connect the controller and set the parameter for the controller

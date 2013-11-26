@@ -124,7 +124,7 @@ public class GestureAnalyser {
 			paraY = fingerDir.getY();
 			
 			System.out.println("up "+finger.tipPosition().getZ());
-			if(finger.tipPosition().getZ()<0){
+			if(finger.tipPosition().getZ()<-100){
 				drawState = 1;
 				if(mouseState == 0)
 					mouseState	=1;	//left down
@@ -193,7 +193,7 @@ public class GestureAnalyser {
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
 			System.out.println(finger.tipPosition().getZ());
-			if(finger.tipPosition().getZ()<0){
+			if(finger.tipPosition().getZ()<-100){
 				drawState = 1;
 				if(mouseState == 0)
 					mouseState	=1;	//left down
