@@ -7,6 +7,7 @@ import edu.pkusz.PCEvent.PCControler;
 public class EventCaller {
 	private int mode;
 	private int state;
+	public int drawState;
 	private int x;
 	private int y;
 	private int num;
@@ -48,7 +49,7 @@ public class EventCaller {
 		case 6:
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
-			pcControler.drawPoint(x/20,- y/20);
+			pcControler.drawPoint(x/20,- y/20,drawState);
 			break;
 		case 7:
 			pcControler.rightClick();

@@ -55,6 +55,13 @@ public class GestureAnalyser {
 	 * 4:right up
 	 * 5:wheel down
 	 * 6:wheel up
+	 * 7:click over
+	 */
+	public int drawState;	//»­Í¼×´Ì¬
+	/*
+	 * 0:nothing
+	 * 1:draw point
+	 * 2:draw rec
 	 */
 //	private Controller controller = null;
 	private PCControler pcController = null;
@@ -117,10 +124,18 @@ public class GestureAnalyser {
 			paraY = fingerDir.getY();
 			
 			System.out.println("up "+finger.tipPosition().getZ());
-			if(finger.tipPosition().getZ()<0)
-				mouseState	=1;	//left down
+			if(finger.tipPosition().getZ()<0){
+				drawState = 1;
+				if(mouseState == 0)
+					mouseState	=1;	//left down
+				else if(mouseState ==1)
+					mouseState =2;
+				else if(mouseState ==2)
+					mouseState = 7;
+			}
 			else{
-				if(mouseState==1)
+				drawState = 0;
+				if(mouseState==1||mouseState==7)
 					mouseState = 2;	//left up
 				else
 					mouseState=0;	//nothing
@@ -178,10 +193,18 @@ public class GestureAnalyser {
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
 			System.out.println(finger.tipPosition().getZ());
-			if(finger.tipPosition().getZ()<0)
-				mouseState	=1;	//left down
+			if(finger.tipPosition().getZ()<0){
+				drawState = 1;
+				if(mouseState == 0)
+					mouseState	=1;	//left down
+				else if(mouseState ==1)
+					mouseState =2;
+				else if(mouseState ==2)
+					mouseState = 7;
+			}
 			else{
-				if(mouseState==1)
+				drawState = 0;
+				if(mouseState==1||mouseState==7)
 					mouseState = 2;	//left up
 				else
 					mouseState=0;	//nothing

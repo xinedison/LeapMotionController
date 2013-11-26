@@ -15,6 +15,7 @@ import edu.pkusz.gestureAnalysis.GestureAnalyser;
 public class LMListener extends Listener {
 	private int mode;
 	private int mouseState;	//Êó±ê×´Ì¬
+	public int drawState;	//»­Í¼×´Ì¬
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
@@ -93,6 +94,8 @@ public class LMListener extends Listener {
 	        	caller.callEvent(this.mode);
 	        }
 	        mouseState = gesAnalyser.mouseState;
+	        drawState = gesAnalyser.drawState;
+	        caller.drawState = drawState;
 	        if(mouseState!=0){
 	        	caller.callMouseState(mouseState);
 	        }

@@ -18,6 +18,7 @@ public class DrawFigureEvent extends JFrame{
 //	private int windowHeight = 300;
 	private boolean startFig = false;
 	private DrawThread drawThread;
+	private Robot robot;
 	
 	public static void main(String[] args){
 		DrawFigureEvent drawFigure = new DrawFigureEvent();
@@ -41,6 +42,11 @@ public class DrawFigureEvent extends JFrame{
 		Color background = new Color(0,0,0,0);	//透明背景
 		this.setBackground(background);
 		this.setFocusableWindowState(false);
+		try{
+			robot = new Robot(); 
+		}catch (AWTException e) {
+			e.printStackTrace();
+		}
 	}
 	public boolean startFigure(){
 		if(startFig)
@@ -48,12 +54,13 @@ public class DrawFigureEvent extends JFrame{
 		startFig = true;
 		figurePanel.clear();
 		delay(50);
+		this.drawPoint(0,0);
 		this.setVisible(true);
-		if(drawThread == null)
-			drawThread = new DrawThread();
-		else
-			drawThread.setFlag(true);
-		 new Thread(drawThread).start();
+//		if(drawThread == null)
+//			drawThread = new DrawThread();
+//		else
+//			drawThread.setFlag(true);
+//		 new Thread(drawThread).start();
 		return true;		
 	}
 	public boolean endFigure(){
@@ -63,8 +70,23 @@ public class DrawFigureEvent extends JFrame{
 		figurePanel.clear();
 		delay(30);
 		this.setVisible(false);
-		drawThread.setFlag(false);
+//		drawThread.setFlag(false);
 		return true;		
+	}
+	public boolean mouseMove(int Vx,int Vy){	//按速度往某方向移动
+		robot.mouseMove(java.awt.MouseInfo.getPointerInfo().getLocation().x+Vx, 
+						java.awt.MouseInfo.getPointerInfo().getLocation().y+Vy);
+		return true;
+	}
+	public boolean drawPoint(){
+		if(!startFig)
+			return false;
+//		figurePanel.drawRec(x, y, x+(int)stroke, y+(int)stroke,color,stroke);
+		figurePanel.drawRec(java.awt.MouseInfo.getPointerInfo().getLocation().x,
+											java.awt.MouseInfo.getPointerInfo().getLocation().y,
+											(int)stroke, (int)stroke,color,stroke);
+		validate();    // 更新所有子控件
+		return true;
 	}
 	public boolean drawPoint(int x,int y){
 		if(!startFig)

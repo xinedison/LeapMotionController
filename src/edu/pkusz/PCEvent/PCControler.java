@@ -97,7 +97,7 @@ public class PCControler {
 			for(int i =0;i<1500;i++){
 				Thread.sleep(10);
 				pcControler.drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
-						 			  java.awt.MouseInfo.getPointerInfo().getLocation().y);
+						 			  java.awt.MouseInfo.getPointerInfo().getLocation().y,1);
 			}
 			pcControler.endFigure();
 			Thread.sleep(2000);
@@ -250,10 +250,11 @@ public class PCControler {
 		drawFigureEvent.endFigure();
 		return true;
 	}
-	public boolean drawPoint(int x,int y){	//在x,y坐标处画点 
+	public boolean drawPoint(int x,int y,int drawState){	//在x,y坐标处画点 
 		if(mode != 2) return false;
-		mouseEvent.move(x, y);
-		//drawFigureEvent.drawPoint(x, y);
+		drawFigureEvent.mouseMove(x, y);
+		if(drawState==1)
+			drawFigureEvent.drawPoint();
 		return true;
 	}
 	
