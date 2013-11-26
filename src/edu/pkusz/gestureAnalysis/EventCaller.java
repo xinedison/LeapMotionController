@@ -6,12 +6,26 @@ import edu.pkusz.PCEvent.PCControler;
 
 public class EventCaller {
 	private int mode;
+	private int state;
 	private int x;
 	private int y;
 	private int num;
 	private double dnum;
 	private PCControler pcControler = new PCControler();
-	
+	public boolean callMouseState(int state){
+		this.state = state;
+		switch(state){
+		case 0:
+			break;
+		case 1:
+			pcControler.leftDown();
+			break;
+		case 2:
+			pcControler.leftUp();
+			break;
+		}
+		return true;
+	}
 	public boolean callEvent(int mode){
 		this.mode = mode;
 		switch(mode){
@@ -35,6 +49,12 @@ public class EventCaller {
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20);
+			break;
+		case 7:
+			pcControler.rightClick();
+			break;
+		case 8:
+			pcControler.leftClick();
 			break;
 		case 15:
 			pcControler.startFigure();

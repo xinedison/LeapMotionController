@@ -32,19 +32,19 @@ public class MouseEvent {
 		return true;
 	}
 	public boolean rightDown(){
-		robot.mousePress(KeyEvent.BUTTON3_DOWN_MASK);
+		robot.mousePress(KeyEvent.BUTTON3_MASK);
 		return true;
 	}
 	public boolean rightUp(){
-		robot.mouseRelease(KeyEvent.BUTTON3_DOWN_MASK);
+		robot.mouseRelease(KeyEvent.BUTTON3_MASK);
 		return true;
 	}
 	public boolean leftDown(){
-		robot.mousePress(KeyEvent.BUTTON1_DOWN_MASK);
+		robot.mousePress(KeyEvent.BUTTON1_MASK);
 		return true;
 	}
 	public boolean leftUp(){
-		robot.mouseRelease(KeyEvent.BUTTON1_DOWN_MASK);
+		robot.mouseRelease(KeyEvent.BUTTON1_MASK);
 		return true;
 	}
 	public boolean wheel(int wheelNum){

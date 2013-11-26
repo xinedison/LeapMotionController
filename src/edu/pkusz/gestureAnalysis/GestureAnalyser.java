@@ -46,7 +46,16 @@ public class GestureAnalyser {
 	*/
 	private double paraX = 0f;
 	private double paraY = 0f;
-	
+	public int mouseState;	//鼠标状态
+	/*
+	 * 0:noting
+	 * 1:left down
+	 * 2:left up
+	 * 3:right down
+	 * 4:right up
+	 * 5:wheel down
+	 * 6:wheel up
+	 */
 //	private Controller controller = null;
 	private PCControler pcController = null;
 	private Vector motionVector = null;
@@ -103,9 +112,19 @@ public class GestureAnalyser {
 		if(fingers.count()<=1){		//1根手指
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
-			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
+//			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
+			
+			System.out.println("up "+finger.tipPosition().getZ());
+			if(finger.tipPosition().getZ()<0)
+				mouseState	=1;	//left down
+			else{
+				if(mouseState==1)
+					mouseState = 2;	//left up
+				else
+					mouseState=0;	//nothing
+			}
 			this.mode = 6;
 		}
 		else{
@@ -158,12 +177,24 @@ public class GestureAnalyser {
 			//System.out.println("x"+fingerDir.getX()+"\ty"+fingerDir.getY());
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
+			System.out.println(finger.tipPosition().getZ());
+			if(finger.tipPosition().getZ()<0)
+				mouseState	=1;	//left down
+			else{
+				if(mouseState==1)
+					mouseState = 2;	//left up
+				else
+					mouseState=0;	//nothing
+			}
 			this.mode = 6;
 		}
 		else if(fingers.count()>=2){		//2根手指		
 			for (int i = 0; i < gestures.count(); i++) {
 		            Gesture gesture = gestures.get(i);
 		            switch (gesture.type()) {
+		            	case	TYPE_SCREEN_TAP:
+		            		this.modeIndex[7]++;
+		            		break;
 		                case TYPE_SWIPE:
 		                    SwipeGesture swipe = new SwipeGesture(gesture);
 		                    int direction = swipeDirection(swipe.direction());
