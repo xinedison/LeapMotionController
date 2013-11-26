@@ -5,63 +5,61 @@ import java.awt.event.KeyEvent;
 import edu.pkusz.PCEvent.PCControler;
 
 public class EventCaller {
-	private int mode;
-	private int state;
-	public int drawState;
+	private Mode mode;
+	private MouseState state;
+	public DrawState drawState = DrawState.Nothing;
 	private int x;
 	private int y;
-	private int num;
-	private double dnum;
 	private PCControler pcControler = new PCControler();
-	public boolean callMouseState(int state){
+	public boolean callMouseState(MouseState state){
 		this.state = state;
 		switch(state){
-		case 0:
+		case Nothing:
 			break;
-		case 1:
+		case LeftDown:
 			pcControler.leftDown();
 			break;
-		case 2:
+		case LeftUp:
 			pcControler.leftUp();
 			break;
 		}
 		return true;
 	}
-	public boolean callEvent(int mode){
+	public boolean callEvent(Mode mode){
 		this.mode = mode;
 		switch(mode){
-		case 1:
+		case StartShow  :
 			pcControler.startShow();
 			System.out.println("start show");
 			break;
-		case 2:
+		case EndShow:
 			pcControler.endShow();
 			System.out.println("end show");
 			break;
-		case 3:
+		case PageDown:
 			pcControler.pageDown();
 			System.out.println("pagedown");
 			break;
-		case 4:
+		case PageUp:
 			pcControler.pageUp();
 			System.out.println("pageup");
 			break;
-		case 6:
+		case MouseMove:
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
-			pcControler.drawPoint(x/20,- y/20,drawState);
+			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
 			break;
-		case 7:
+		case RightClk:
 			pcControler.rightClick();
 			break;
-		case 8:
+		case LeftClk:
 			pcControler.leftClick();
 			break;
-		case 15:
+		case StartFigure:
 			pcControler.startFigure();
 			System.out.println("start figure");
 			break;
-		case 16:
+		case EndFigure:
 			pcControler.endFigure();
 			System.out.println("end figure");
 			break;
@@ -72,13 +70,5 @@ public class EventCaller {
 	public void setParam(int x,int y){
 		this.x = x;
 		this.y = y;
-	}
-	public void setParam(int num){
-		
-		
-	}
-	public void setParam(double dnum){
-		
-		
 	}
 }

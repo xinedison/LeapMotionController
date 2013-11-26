@@ -9,19 +9,23 @@ import com.leapmotion.leap.Gesture;
 import com.leapmotion.leap.Listener;
 import com.leapmotion.leap.Vector;
 
+import edu.pkusz.gestureAnalysis.DrawState;
 import edu.pkusz.gestureAnalysis.EventCaller;
 import edu.pkusz.gestureAnalysis.GestureAnalyser;
+import edu.pkusz.gestureAnalysis.Mode;
+import edu.pkusz.gestureAnalysis.MouseState;
 
 public class LMListener extends Listener {
-	private int mode;
-	private int mouseState;	//鼠标状态
-	public int drawState;	//画图状态
+	private Mode mode;
+	private MouseState mouseState;	//鼠标状态
+	public DrawState drawState;	//画图状态
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
 	private EventCaller caller = new EventCaller();
 	//init the controller
     public void onInit(Controller controller) {
+    	//设置leap motion可在后台运行
     	controller.setPolicyFlags(Controller.PolicyFlag.POLICY_BACKGROUND_FRAMES);
         System.out.println("Initialized");
     }
@@ -72,14 +76,13 @@ public class LMListener extends Listener {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
         if(frame.fingers().count()==0){//当前如果没有手指的话，将上次缓存动作实施
-        	this.mode = gesAnalyser.getBestModeIndex();
+        	this.mode = gesAnalyser.getBestMode();
         	gesAnalyser.clearModeIndex();
-	        Vector mv = gesAnalyser.getMotionParam();		//设置参数
 	//        caller.setParam((int)mv.getX(), (int)mv.getY());
         	caller.callEvent(this.mode);
     	}else{	//有手指
-	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
-	        if(tempmode == 6){
+	        Mode tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
+	        if(tempmode == Mode.MouseMove){
 	        	this.mode = tempmode;
 	        	double x = gesAnalyser.getParaX();
 	        	double y = gesAnalyser.getParaY();
@@ -94,10 +97,10 @@ public class LMListener extends Listener {
 	    		caller.setParam((int)x,(int) y);
 	        	caller.callEvent(this.mode);
 	        }
-	        mouseState = gesAnalyser.mouseState;
-	        drawState = gesAnalyser.drawState;
+	        mouseState = gesAnalyser.getMouseState();
+	        drawState = gesAnalyser.getDrawState();
 	        caller.drawState = drawState;
-	        if(mouseState!=0){
+	        if(mouseState!=MouseState.Nothing){
 	        	caller.callMouseState(mouseState);
 	        }
         }

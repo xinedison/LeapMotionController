@@ -21,7 +21,7 @@ import edu.pkusz.PCEvent.PCControler;
 import edu.pkusz.leapMotion.LMListener;
 
 public class GestureAnalyser {
-	private int mode;
+	private Mode mode;
 	private int modeNum = 17;
 	private int[] modeIndex = new int[modeNum];
 	/*
@@ -46,7 +46,7 @@ public class GestureAnalyser {
 	*/
 	private double paraX = 0f;
 	private double paraY = 0f;
-	public int mouseState;	//鼠标状态
+	private MouseState  mouseState;	//鼠标状态
 	/*
 	 * 0:noting
 	 * 1:left down
@@ -57,7 +57,7 @@ public class GestureAnalyser {
 	 * 6:wheel up
 	 * 7:click over
 	 */
-	public int drawState;	//画图状态
+	private DrawState drawState;	//画图状态
 	/*
 	 * 0:nothing
 	 * 1:draw point
@@ -65,7 +65,6 @@ public class GestureAnalyser {
 	 */
 //	private Controller controller = null;
 	private PCControler pcController = null;
-	private Vector motionVector = null;
 	
 	public GestureAnalyser(Controller controller){
 //		this.controller = controller;
@@ -81,23 +80,23 @@ public class GestureAnalyser {
 		for(int i=0;i<modeNum;i++)
 			modeIndex[i] = 0;		
 	}
-	public int getBestModeIndex(){	//调用以计算一次gesture结束时的最终结果
+	public Mode getBestMode(){	//调用以计算一次gesture结束时的最终结果
 		int maxMode = 0;
-		mode = 0;
+		mode = Mode.Nothing;
 		for(int i=0;i<modeNum;i++)
 			if(maxMode<modeIndex[i] ){
 				maxMode=modeIndex[i];
-				mode = i;
+				mode = Mode.class.getEnumConstants()[i];
 			}
 		return mode;
 	}
-	public void setMode(int mode){
+	public void setMode(Mode mode){
 		this.mode = mode;
 	}
-	public int getMode(){
+	public Mode getMode(){
 		return mode;
 	}
-	public int analyseFrame(Frame frame){
+	public Mode analyseFrame(Frame frame){
 		//分析识别到的手势信息,如果有gesture，分析gesture
 		GestureList gestures = frame.gestures();
 		if(!gestures.isEmpty())
@@ -125,29 +124,26 @@ public class GestureAnalyser {
 			
 			System.out.println("up "+finger.tipPosition().getZ());
 			if(finger.tipPosition().getZ()<-100){
-				drawState = 1;
-				if(mouseState == 0)
-					mouseState	=1;	//left down
-				else if(mouseState ==1)
-					mouseState =2;
-				else if(mouseState ==2)
-					mouseState = 7;
+				drawState = DrawState.DrawPoint;
+				if(mouseState==MouseState.Nothing)
+					mouseState	= MouseState.LeftDown;	//left down
+				else if(mouseState==MouseState.Nothing)
+					mouseState = MouseState.LeftUp;
+				else if(mouseState ==MouseState.LeftUp)
+					mouseState = MouseState.ClkOver;
 			}
 			else{
-				drawState = 0;
-				if(mouseState==1||mouseState==7)
-					mouseState = 2;	//left up
+				drawState = DrawState.Nothing;
+				if(mouseState==MouseState.LeftDown||mouseState==MouseState.ClkOver)
+					mouseState = MouseState.LeftUp;	//left up
 				else
-					mouseState=0;	//nothing
+					mouseState=MouseState.Nothing;	//nothing
 			}
-			this.mode = 6;
+			this.mode = Mode.MouseMove;
 		}
 		else{
-			this.mode = 0;
+			this.mode = Mode.Nothing;
 		}
-	}
-	public Vector getMotionParam(){
-		return this.motionVector;
 	}
 	/*
 	 * analyse the direction of the swipe gesture
@@ -178,13 +174,19 @@ public class GestureAnalyser {
 		}
 		return 0;
 	}
+	public MouseState getMouseState(){
+		return mouseState;
+	}
+	public DrawState getDrawState(){
+		return drawState;
+	}
 	/*
 	 * analyse the gestures leap motion percepted
 	 */
-	private int analyseGesture(GestureList gestures,Frame frame){
+	private Mode analyseGesture(GestureList gestures,Frame frame){
 		FingerList fingers = frame.fingers();
 		if(fingers.count() ==0) 	//没有手指
-			mode = 0;
+			mode = Mode.Nothing;
 		else if(fingers.count()<=1){		//1根手指
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
@@ -194,22 +196,22 @@ public class GestureAnalyser {
 			paraY = fingerDir.getY();
 			System.out.println(finger.tipPosition().getZ());
 			if(finger.tipPosition().getZ()<-100){
-				drawState = 1;
-				if(mouseState == 0)
-					mouseState	=1;	//left down
-				else if(mouseState ==1)
-					mouseState =2;
-				else if(mouseState ==2)
-					mouseState = 7;
+				drawState = DrawState.DrawPoint;
+				if(mouseState==MouseState.Nothing)
+					mouseState	= MouseState.LeftDown;	//left down
+				else if(mouseState==MouseState.Nothing)
+					mouseState = MouseState.LeftUp;
+				else if(mouseState ==MouseState.LeftUp)
+					mouseState = MouseState.ClkOver;
 			}
 			else{
-				drawState = 0;
-				if(mouseState==1||mouseState==7)
-					mouseState = 2;	//left up
+				drawState = DrawState.Nothing;
+				if(mouseState==MouseState.LeftDown||mouseState==MouseState.ClkOver)
+					mouseState = MouseState.LeftUp;	//left up
 				else
-					mouseState=0;	//nothing
+					mouseState=MouseState.Nothing;	//nothing
 			}
-			this.mode = 6;
+			this.mode = Mode.MouseMove;
 		}
 		else if(fingers.count()>=2){		//2根手指		
 			for (int i = 0; i < gestures.count(); i++) {
@@ -223,27 +225,27 @@ public class GestureAnalyser {
 		                    int direction = swipeDirection(swipe.direction());
 		                    	if(direction==1){
 		                    		this.modeIndex[3]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		                    	else if(direction==2){
 		                    		this.modeIndex[4]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		                    	else if(direction==5){
 		                    		this.modeIndex[1]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		                    	else if(direction==6){
 		                    		this.modeIndex[2]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		                    	else if(direction==3){
 		                    		this.modeIndex[15]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		                    	else if(direction==4){
 		                    		this.modeIndex[16]++;
-		                    		this.mode = 0;
+		                    		this.mode = Mode.Nothing;
 		                    	}
 		            }
 		    }
