@@ -3,6 +3,8 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import edu.pkusz.PCEvent.MagnifierEvent.MagnifierThread;
+
 import java.util.Vector;
 
 public class DrawFigureEvent extends JFrame{
@@ -12,17 +14,20 @@ public class DrawFigureEvent extends JFrame{
 	private float stroke = 3f;
 	private int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
 	private int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+//	private int windowWidth = 500;
+//	private int windowHeight = 300;
 	private boolean startFig = false;
+	private DrawThread drawThread;
 	
 	public static void main(String[] args){
 		DrawFigureEvent drawFigure = new DrawFigureEvent();
 		drawFigure.delay(500);
 		drawFigure.startFigure();
-		for(int i=0;i<150;i++){
-			drawFigure.drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
-					 java.awt.MouseInfo.getPointerInfo().getLocation().y);
-			drawFigure.delay(1);
-		}
+//		for(int i=0;i<1500;i++){
+//			drawFigure.drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
+//					 java.awt.MouseInfo.getPointerInfo().getLocation().y);
+//			drawFigure.delay(1);
+//		}
 		//drawFigure.endFigure();
 	}
 	public DrawFigureEvent(){
@@ -41,14 +46,24 @@ public class DrawFigureEvent extends JFrame{
 		if(startFig)
 			return false;
 		startFig = true;
+		figurePanel.clear();
+		delay(50);
 		this.setVisible(true);
+		if(drawThread == null)
+			drawThread = new DrawThread();
+		else
+			drawThread.setFlag(true);
+		 new Thread(drawThread).start();
 		return true;		
 	}
 	public boolean endFigure(){
 		if(!startFig)
 			return false;
 		startFig = false;
+		figurePanel.clear();
+		delay(30);
 		this.setVisible(false);
+		drawThread.setFlag(false);
 		return true;		
 	}
 	public boolean drawPoint(int x,int y){
@@ -83,6 +98,25 @@ public class DrawFigureEvent extends JFrame{
 	public void delay(int time){
 		figurePanel.delay(time);
 	}
+
+	class DrawThread implements Runnable{
+        public void run(){
+            while(this.flag){
+                try{
+                	drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
+   					 java.awt.MouseInfo.getPointerInfo().getLocation().y);
+                	delay(1);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } 
+        public void setFlag(boolean flag){
+            this.flag = flag;
+        } 
+        private boolean flag = true;
+    }
+
 }
 
 class FigurePanel extends JPanel
@@ -138,6 +172,12 @@ class FigurePanel extends JPanel
     public void delay(int time){
 		robot.delay(time);
 	}
+    public void clear(){
+    	vRec.clear();
+    	vLine.clear();
+    	vOval.clear();
+    	repaint();
+    }
 }
 
 class FigureLineInfo{

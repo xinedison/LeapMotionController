@@ -1,7 +1,6 @@
 package edu.pkusz.leapMotion;
 
 
-import com.leapmotion.leap.Config;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
@@ -13,6 +12,8 @@ import edu.pkusz.gestureAnalysis.GestureAnalyser;
 
 public class LMListener extends Listener {
 	private int mode;
+	private double preParaX = 0f;
+	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
 	private EventCaller caller = new EventCaller();
 	//init the controller
@@ -59,18 +60,36 @@ public class LMListener extends Listener {
     public void onExit(Controller controller) {
         System.out.println("Exited");
     }
+    /**
+     * 分析每一帧数据，获取手势信息
+     */
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
-
-        if(frame.fingers().count()==0){
+        if(frame.fingers().count()==0){//当前如果没有手指的话，将上次缓存动作实施
         	this.mode = gesAnalyser.getBestModeIndex();
         	gesAnalyser.clearModeIndex();
-	        Vector mv = gesAnalyser.getMotionParam();			//设置参数
+	        Vector mv = gesAnalyser.getMotionParam();		//设置参数
 	//        caller.setParam((int)mv.getX(), (int)mv.getY());
         	caller.callEvent(this.mode);
     	}else{	//有手指
-	        gesAnalyser.analyseFrame(frame);	//分析mode
+	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
+	        if(tempmode == 6){
+	        	this.mode = tempmode;
+	        	double x = gesAnalyser.getParaX();
+	        	double y = gesAnalyser.getParaY();
+	    		System.out.println("prex"+(int)preParaX+"x"+(int)x);
+	    		if((int)(preParaX*10) ==(int)(x*10))
+	    			x = 0;
+	    		else
+	    			preParaX = x;
+	    		if((int)(preParaY*10) ==(int)(y*10))
+	    			y = 0;
+	    		else
+	    			preParaY = y;
+	    		caller.setParam((int)x,(int) y);
+	        	caller.callEvent(this.mode);
+	        }
         }
     }
 }

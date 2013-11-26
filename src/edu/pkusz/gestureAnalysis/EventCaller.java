@@ -16,7 +16,13 @@ public class EventCaller {
 		this.mode = mode;
 		switch(mode){
 		case 1:
-			pcControler.keyPress(KeyEvent.VK_C);break;
+			pcControler.startShow();
+			System.out.println("start show");
+			break;
+		case 2:
+			pcControler.endShow();
+			System.out.println("end show");
+			break;
 		case 3:
 			pcControler.pageDown();
 			System.out.println("pagedown");
@@ -25,6 +31,19 @@ public class EventCaller {
 			pcControler.pageUp();
 			System.out.println("pageup");
 			break;
+		case 6:
+//			System.out.println(x+"\t"+y);
+			pcControler.mouseMove(x/20,- y/20);
+			break;
+		case 15:
+			pcControler.startFigure();
+			System.out.println("start figure");
+			break;
+		case 16:
+			pcControler.endFigure();
+			System.out.println("end figure");
+			break;
+		default :break;
 		}
 		return true;
 	}

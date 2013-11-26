@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.leapmotion.leap.CircleGesture;
 import com.leapmotion.leap.Controller;
+import com.leapmotion.leap.Finger;
 import com.leapmotion.leap.FingerList;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
@@ -43,15 +44,20 @@ public class GestureAnalyser {
 	 * 16:figureModeEnd
 	 * 17:drawPoint	
 	*/
-	private Controller controller = null;
+	private double paraX = 0f;
+	private double paraY = 0f;
+	
+//	private Controller controller = null;
 	private PCControler pcController = null;
 	private Vector motionVector = null;
+	
 	
 	public static void main(String[] args){
 //		MainController mainController = new MainController();
 		LMListener listener = new LMListener();
 		Controller controller = new Controller();
 		controller.addListener(listener);
+		//while(true);
 		 try {
 	            System.in.read();
 	        } catch (IOException e) {
@@ -61,7 +67,7 @@ public class GestureAnalyser {
 	}
 	
 	public GestureAnalyser(Controller controller){
-		this.controller = controller;
+//		this.controller = controller;
 		pcController = new PCControler();
 		try {
 			Thread.sleep(3000);
@@ -100,7 +106,7 @@ public class GestureAnalyser {
 		//分析识别到的手势信息
         GestureList gestures = frame.gestures();
         if(!gestures.isEmpty())
-        	analyseGesture(gestures);
+        	analyseGesture(gestures,frame);
 //        mode = 1;
         return mode;
 	}
@@ -118,28 +124,80 @@ public class GestureAnalyser {
 	 * 四个指头向左，pageup
 	 * 四个指头向右，pagedown
 	 */
-	private boolean swipeDirectionDown(Vector endSwipeDirection){
-		System.out.println(endSwipeDirection.getX());
-		if(endSwipeDirection.getX()>0)
-			return true;
-		return false;
+	private int swipeDirection(Vector direction){	//1:x 2:-x 3:y 4:-y 5:z 6:-z
+		double x = Math.abs(direction.getX());
+		double y = Math.abs(direction.getY());
+		double z = Math.abs(direction.getZ());
+		if(x>y&&x>z){
+			if(direction.getX()>0)
+				return 1;
+			else
+				return 2;
+		}
+		if(y>x&&y>z){
+			if(direction.getY()>0)
+				return 3;
+			else
+				return 4;
+		}
+		if(z>x&&z>y){
+			if(direction.getZ()>0)
+				return 5;
+			else
+				return 6;
+		}
+		return 0;
 	}
 	/*
 	 * analyse the gestures leap motion percepted
 	 */
-	private void analyseGesture(GestureList gestures){
-		if(gestures.count() ==0) mode = 0;
-		 for (int i = 0; i < gestures.count(); i++) {
-	            Gesture gesture = gestures.get(i);
-	            switch (gesture.type()) {
-	                case TYPE_SWIPE:
-	                    SwipeGesture swipe = new SwipeGesture(gesture);
-	                    	if(swipeDirectionDown(swipe.direction())){
-	                    		this.modeIndex[3]++;
-	                    	}else{
-	                    		this.modeIndex[4]++;
-	                    	}
-	            }
-	        }
+	private int analyseGesture(GestureList gestures,Frame frame){
+		FingerList fingers = frame.fingers();
+		if(fingers.count() ==0) 	//没有手指
+			mode = 0;
+		else if(fingers.count()<=2){		//1根手指
+			Finger finger = fingers.get(0);
+			Vector fingerDir = finger.tipVelocity();
+			
+			//System.out.println("x"+fingerDir.getX()+"\ty"+fingerDir.getY());
+			paraX = fingerDir.getX();
+			paraY = fingerDir.getY();
+			this.mode = 6;
+		}
+		else if(fingers.count()>=3){		//2根手指		
+			for (int i = 0; i < gestures.count(); i++) {
+		            Gesture gesture = gestures.get(i);
+		            switch (gesture.type()) {
+		                case TYPE_SWIPE:
+		                    SwipeGesture swipe = new SwipeGesture(gesture);
+		                    int direction = swipeDirection(swipe.direction());
+		                    	if(direction==1){
+		                    		this.modeIndex[3]++;
+		                    	}
+		                    	else if(direction==2){
+		                    		this.modeIndex[4]++;
+		                    	}
+		                    	else if(direction==5){
+		                    		this.modeIndex[1]++;
+		                    	}
+		                    	else if(direction==6){
+		                    		this.modeIndex[2]++;
+		                    	}
+		                    	else if(direction==3){
+		                    		this.modeIndex[15]++;
+		                    	}
+		                    	else if(direction==4){
+		                    		this.modeIndex[16]++;
+		                    	}
+		            }
+		    }
+		}
+		return mode;
+	}
+	public double getParaX(){
+		return paraX;
+	}
+	public double getParaY(){
+		return paraY;
 	}
 }
