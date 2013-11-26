@@ -1,6 +1,8 @@
 package edu.pkusz.leapMotion;
 
 
+import java.io.IOException;
+
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
@@ -78,7 +80,6 @@ public class LMListener extends Listener {
 	        	this.mode = tempmode;
 	        	double x = gesAnalyser.getParaX();
 	        	double y = gesAnalyser.getParaY();
-	    		System.out.println("prex"+(int)preParaX+"x"+(int)x);
 	    		if((int)(preParaX*10) ==(int)(x*10))
 	    			x = 0;
 	    		else
@@ -92,4 +93,18 @@ public class LMListener extends Listener {
 	        }
         }
     }
+    
+	public static void main(String[] args){
+//		MainController mainController = new MainController();
+		LMListener listener = new LMListener();
+		Controller controller = new Controller();
+		controller.addListener(listener);
+		//while(true);
+		 try {
+	            System.in.read();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+        controller.removeListener(listener);
+	}
 }

@@ -34,6 +34,7 @@ public class EventCaller {
 		case 6:
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
+			pcControler.drawPoint(x/20,- y/20);
 			break;
 		case 15:
 			pcControler.startFigure();

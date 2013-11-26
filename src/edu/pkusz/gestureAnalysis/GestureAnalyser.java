@@ -51,21 +51,6 @@ public class GestureAnalyser {
 	private PCControler pcController = null;
 	private Vector motionVector = null;
 	
-	
-	public static void main(String[] args){
-//		MainController mainController = new MainController();
-		LMListener listener = new LMListener();
-		Controller controller = new Controller();
-		controller.addListener(listener);
-		//while(true);
-		 try {
-	            System.in.read();
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-        controller.removeListener(listener);
-	}
-	
 	public GestureAnalyser(Controller controller){
 //		this.controller = controller;
 		pcController = new PCControler();
@@ -97,16 +82,17 @@ public class GestureAnalyser {
 		return mode;
 	}
 	public int analyseFrame(Frame frame){
+		//分析识别到的手势信息,如果有gesture，分析gesture
+		GestureList gestures = frame.gestures();
+		if(!gestures.isEmpty())
+			analyseGesture(gestures,frame);
 		//如果有手的信息，分析手
-		if (!frame.hands().isEmpty()) {
-			analyseHands(frame.hands());
-		}else if(!frame.fingers().isEmpty()){  //如果没有手有手指信息，分析手指
+//		else if (!frame.hands().isEmpty()) {
+//			analyseHands(frame.hands());
+//		}
+		else if(!frame.fingers().isEmpty()){  //如果没有gesture，而有手指在
 			analyseFingers(frame.fingers());
 		}
-		//分析识别到的手势信息
-        GestureList gestures = frame.gestures();
-        if(!gestures.isEmpty())
-        	analyseGesture(gestures,frame);
 //        mode = 1;
         return mode;
 	}
@@ -114,7 +100,17 @@ public class GestureAnalyser {
 		
 	}
 	private void analyseFingers(FingerList fingers){
-		
+		if(fingers.count()<=1){		//1根手指
+			Finger finger = fingers.get(0);
+			Vector fingerDir = finger.tipVelocity();
+			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
+			paraX = fingerDir.getX();
+			paraY = fingerDir.getY();
+			this.mode = 6;
+		}
+		else{
+			this.mode = 0;
+		}
 	}
 	public Vector getMotionParam(){
 		return this.motionVector;
@@ -155,7 +151,7 @@ public class GestureAnalyser {
 		FingerList fingers = frame.fingers();
 		if(fingers.count() ==0) 	//没有手指
 			mode = 0;
-		else if(fingers.count()<=2){		//1根手指
+		else if(fingers.count()<=1){		//1根手指
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
 			
@@ -164,7 +160,7 @@ public class GestureAnalyser {
 			paraY = fingerDir.getY();
 			this.mode = 6;
 		}
-		else if(fingers.count()>=3){		//2根手指		
+		else if(fingers.count()>=2){		//2根手指		
 			for (int i = 0; i < gestures.count(); i++) {
 		            Gesture gesture = gestures.get(i);
 		            switch (gesture.type()) {
@@ -173,21 +169,27 @@ public class GestureAnalyser {
 		                    int direction = swipeDirection(swipe.direction());
 		                    	if(direction==1){
 		                    		this.modeIndex[3]++;
+		                    		this.mode = 0;
 		                    	}
 		                    	else if(direction==2){
 		                    		this.modeIndex[4]++;
+		                    		this.mode = 0;
 		                    	}
 		                    	else if(direction==5){
 		                    		this.modeIndex[1]++;
+		                    		this.mode = 0;
 		                    	}
 		                    	else if(direction==6){
 		                    		this.modeIndex[2]++;
+		                    		this.mode = 0;
 		                    	}
 		                    	else if(direction==3){
 		                    		this.modeIndex[15]++;
+		                    		this.mode = 0;
 		                    	}
 		                    	else if(direction==4){
 		                    		this.modeIndex[16]++;
+		                    		this.mode = 0;
 		                    	}
 		            }
 		    }

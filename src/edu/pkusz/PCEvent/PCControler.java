@@ -252,7 +252,8 @@ public class PCControler {
 	}
 	public boolean drawPoint(int x,int y){	//在x,y坐标处画点 
 		if(mode != 2) return false;
-		drawFigureEvent.drawPoint(x, y);
+		mouseEvent.move(x, y);
+		//drawFigureEvent.drawPoint(x, y);
 		return true;
 	}
 	
