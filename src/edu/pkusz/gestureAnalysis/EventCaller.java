@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent;
 import edu.pkusz.PCEvent.PCControler;
 
 public class EventCaller {
-	private Mode mode;
+	private int mode;
 	private MouseState state;
 	public DrawState drawState = DrawState.Nothing;
 	private int x;
@@ -25,41 +25,41 @@ public class EventCaller {
 		}
 		return true;
 	}
-	public boolean callEvent(Mode mode){
+	public boolean callEvent(int mode){
 		this.mode = mode;
 		switch(mode){
-		case StartShow  :
+		case Mode.StartShow  :
 			pcControler.startShow();
 			System.out.println("start show");
 			break;
-		case EndShow:
+		case Mode.EndShow:
 			pcControler.endShow();
 			System.out.println("end show");
 			break;
-		case PageDown:
+		case Mode.PageDown:
 			pcControler.pageDown();
 			System.out.println("pagedown");
 			break;
-		case PageUp:
+		case Mode.PageUp:
 			pcControler.pageUp();
 			System.out.println("pageup");
 			break;
-		case MouseMove:
+		case Mode.MouseMove:
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
 			break;
-		case RightClk:
+		case Mode.RightClk:
 			pcControler.rightClick();
 			break;
-		case LeftClk:
+		case Mode.LeftClk:
 			pcControler.leftClick();
 			break;
-		case StartFigure:
+		case Mode.StartFigure:
 			pcControler.startFigure();
 			System.out.println("start figure");
 			break;
-		case EndFigure:
+		case Mode.EndFigure:
 			pcControler.endFigure();
 			System.out.println("end figure");
 			break;

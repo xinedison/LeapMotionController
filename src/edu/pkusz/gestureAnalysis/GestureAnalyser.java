@@ -21,7 +21,7 @@ import edu.pkusz.PCEvent.PCControler;
 import edu.pkusz.leapMotion.LMListener;
 
 public class GestureAnalyser {
-	private Mode mode;
+	private int mode;
 	private int modeNum = 17;
 	private int[] modeIndex = new int[modeNum];
 	/*
@@ -46,7 +46,7 @@ public class GestureAnalyser {
 	*/
 	private double paraX = 0f;
 	private double paraY = 0f;
-	private MouseState  mouseState;	//鼠标状态
+	private MouseState  mouseState = MouseState.Nothing;	//鼠标状态
 	/*
 	 * 0:noting
 	 * 1:left down
@@ -57,7 +57,7 @@ public class GestureAnalyser {
 	 * 6:wheel up
 	 * 7:click over
 	 */
-	private DrawState drawState;	//画图状态
+	private DrawState drawState = DrawState.Nothing;	//画图状态
 	/*
 	 * 0:nothing
 	 * 1:draw point
@@ -80,23 +80,23 @@ public class GestureAnalyser {
 		for(int i=0;i<modeNum;i++)
 			modeIndex[i] = 0;		
 	}
-	public Mode getBestMode(){	//调用以计算一次gesture结束时的最终结果
+	public int getBestMode(){	//调用以计算一次gesture结束时的最终结果
 		int maxMode = 0;
 		mode = Mode.Nothing;
 		for(int i=0;i<modeNum;i++)
 			if(maxMode<modeIndex[i] ){
 				maxMode=modeIndex[i];
-				mode = Mode.class.getEnumConstants()[i];
+				mode = Mode.getModeByIndex(i);
 			}
 		return mode;
 	}
-	public void setMode(Mode mode){
+	public void setMode(int mode){
 		this.mode = mode;
 	}
-	public Mode getMode(){
+	public int getMode(){
 		return mode;
 	}
-	public Mode analyseFrame(Frame frame){
+	public int analyseFrame(Frame frame){
 		//分析识别到的手势信息,如果有gesture，分析gesture
 		GestureList gestures = frame.gestures();
 		if(!gestures.isEmpty())
@@ -105,7 +105,8 @@ public class GestureAnalyser {
 //		else if (!frame.hands().isEmpty()) {
 //			analyseHands(frame.hands());
 //		}
-		else if(!frame.fingers().isEmpty()){  //如果没有gesture，而有手指在
+//		else 
+		if(!frame.fingers().isEmpty()){  //如果没有gesture，而有手指在
 			analyseFingers(frame.fingers());
 		}
 //        mode = 1;
@@ -115,7 +116,7 @@ public class GestureAnalyser {
 		
 	}
 	private void analyseFingers(FingerList fingers){
-		if(fingers.count()<=1){		//1根手指
+		if(fingers.count()==1){		//1根手指
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
 //			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
@@ -127,7 +128,7 @@ public class GestureAnalyser {
 				drawState = DrawState.DrawPoint;
 				if(mouseState==MouseState.Nothing)
 					mouseState	= MouseState.LeftDown;	//left down
-				else if(mouseState==MouseState.Nothing)
+				else if(mouseState==MouseState.LeftDown)
 					mouseState = MouseState.LeftUp;
 				else if(mouseState ==MouseState.LeftUp)
 					mouseState = MouseState.ClkOver;
@@ -183,72 +184,39 @@ public class GestureAnalyser {
 	/*
 	 * analyse the gestures leap motion percepted
 	 */
-	private Mode analyseGesture(GestureList gestures,Frame frame){
-		FingerList fingers = frame.fingers();
-		if(fingers.count() ==0) 	//没有手指
-			mode = Mode.Nothing;
-		else if(fingers.count()<=1){		//1根手指
-			Finger finger = fingers.get(0);
-			Vector fingerDir = finger.tipVelocity();
-			
-			//System.out.println("x"+fingerDir.getX()+"\ty"+fingerDir.getY());
-			paraX = fingerDir.getX();
-			paraY = fingerDir.getY();
-			System.out.println(finger.tipPosition().getZ());
-			if(finger.tipPosition().getZ()<-100){
-				drawState = DrawState.DrawPoint;
-				if(mouseState==MouseState.Nothing)
-					mouseState	= MouseState.LeftDown;	//left down
-				else if(mouseState==MouseState.Nothing)
-					mouseState = MouseState.LeftUp;
-				else if(mouseState ==MouseState.LeftUp)
-					mouseState = MouseState.ClkOver;
+	private int analyseGesture(GestureList gestures,Frame frame){
+		for (int i = 0; i < gestures.count(); i++) {
+			Gesture gesture = gestures.get(i);
+			HandList gesHands = gesture.hands();
+			System.out.println(gesHands.count());
+			System.out.println("finger" + frame.fingers().count());
+			switch (gesture.type()) {
+			case TYPE_SCREEN_TAP:
+				this.modeIndex[7]++;
+				break;
+			case TYPE_SWIPE:
+				SwipeGesture swipe = new SwipeGesture(gesture);
+				int direction = swipeDirection(swipe.direction());
+				if (direction == 1) {
+					this.modeIndex[3]++;
+					this.mode = Mode.Nothing;
+				} else if (direction == 2) {
+					this.modeIndex[4]++;
+					this.mode = Mode.Nothing;
+				} else if (direction == 5) {
+					this.modeIndex[1]++;
+					this.mode = Mode.Nothing;
+				} else if (direction == 6) {
+					this.modeIndex[2]++;
+					this.mode = Mode.Nothing;
+				} else if (direction == 3) {
+					this.modeIndex[15]++;
+					this.mode = Mode.Nothing;
+				} else if (direction == 4) {
+					this.modeIndex[16]++;
+					this.mode = Mode.Nothing;
+				}
 			}
-			else{
-				drawState = DrawState.Nothing;
-				if(mouseState==MouseState.LeftDown||mouseState==MouseState.ClkOver)
-					mouseState = MouseState.LeftUp;	//left up
-				else
-					mouseState=MouseState.Nothing;	//nothing
-			}
-			this.mode = Mode.MouseMove;
-		}
-		else if(fingers.count()>=2){		//2根手指		
-			for (int i = 0; i < gestures.count(); i++) {
-		            Gesture gesture = gestures.get(i);
-		            switch (gesture.type()) {
-		            	case	TYPE_SCREEN_TAP:
-		            		this.modeIndex[7]++;
-		            		break;
-		                case TYPE_SWIPE:
-		                    SwipeGesture swipe = new SwipeGesture(gesture);
-		                    int direction = swipeDirection(swipe.direction());
-		                    	if(direction==1){
-		                    		this.modeIndex[3]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		                    	else if(direction==2){
-		                    		this.modeIndex[4]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		                    	else if(direction==5){
-		                    		this.modeIndex[1]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		                    	else if(direction==6){
-		                    		this.modeIndex[2]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		                    	else if(direction==3){
-		                    		this.modeIndex[15]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		                    	else if(direction==4){
-		                    		this.modeIndex[16]++;
-		                    		this.mode = Mode.Nothing;
-		                    	}
-		            }
-		    }
 		}
 		return mode;
 	}

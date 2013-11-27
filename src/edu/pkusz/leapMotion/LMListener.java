@@ -16,9 +16,9 @@ import edu.pkusz.gestureAnalysis.Mode;
 import edu.pkusz.gestureAnalysis.MouseState;
 
 public class LMListener extends Listener {
-	private Mode mode;
-	private MouseState mouseState;	//Êó±ê×´Ì¬
-	public DrawState drawState;	//»­Í¼×´Ì¬
+	private int mode = Mode.Nothing;
+	private MouseState mouseState = MouseState.Nothing;	//Êó±ê×´Ì¬
+	public DrawState drawState = DrawState.Nothing;	//»­Í¼×´Ì¬
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
@@ -40,23 +40,13 @@ public class LMListener extends Listener {
 //        Config config = controller.config();
 //     // key tap parameters
 //        config.setFloat("Gesture.KeyTap.MinDownVelocity", 30.0f);
-//
-//        System.out.println("Key Tap MinDownVelocity: " +
-//                     config.getFloat("Gesture.KeyTap.MinDownVelocity"));
-//        System.out.println("Key Tap HistorySeconds: " + 
-//                     config.getFloat("Gesture.KeyTap.HistorySeconds"));
-//        System.out.println("Key Tap MinDistance: " + 
-//                     config.getFloat("Gesture.KeyTap.MinDistance"));
-//        System.out.println();
-//
 //        // screen tap parameters
 //        config.setFloat("Gesture.ScreenTap.MinForwardVelocity", 30.0f);
 //        config.setFloat("Gesture.ScreenTap.MinDistance", 1.0f);
-//        
 //        //config the swipe gesture parameter
 ////        controller.config().setFloat("Gesture.Swipe.MinLength", 200.0f) ;
 ////        controller.config().setFloat("Gesture.Swipe.MinVelocity", 750);
-//        
+//        //save the config change
 //        controller.config().save();
         this.gesAnalyser = new GestureAnalyser(controller);
     }
@@ -81,7 +71,7 @@ public class LMListener extends Listener {
 	//        caller.setParam((int)mv.getX(), (int)mv.getY());
         	caller.callEvent(this.mode);
     	}else{	//ÓÐÊÖÖ¸
-	        Mode tempmode = gesAnalyser.analyseFrame(frame);	//·ÖÎömode
+	        int tempmode = gesAnalyser.analyseFrame(frame);	//·ÖÎömode
 	        if(tempmode == Mode.MouseMove){
 	        	this.mode = tempmode;
 	        	double x = gesAnalyser.getParaX();
