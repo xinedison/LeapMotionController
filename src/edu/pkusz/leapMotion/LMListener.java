@@ -22,7 +22,12 @@ public class LMListener extends Listener {
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
-	private EventCaller caller = new EventCaller();
+	private EventCaller caller = null;
+	
+	public LMListener(){
+		if(caller == null)
+			caller = new EventCaller();
+	}
 	//init the controller
     public void onInit(Controller controller) {
     	//设置leap motion可在后台运行
@@ -84,7 +89,7 @@ public class LMListener extends Listener {
 	    			y = 0;
 	    		else
 	    			preParaY = y;
-	    		caller.setParam((int)x,(int) y);
+	    		caller.setParam((int)x,(int) y,(int)gesAnalyser.getParaZ());
 	        	caller.callEvent(this.mode);
 	        }
 	        mouseState = gesAnalyser.getMouseState();

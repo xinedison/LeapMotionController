@@ -46,6 +46,7 @@ public class GestureAnalyser {
 	*/
 	private double paraX = 0f;
 	private double paraY = 0f;
+	private double paraZ = 0f;
 	private MouseState  mouseState = MouseState.Nothing;	//Êó±ê×´Ì¬
 	/*
 	 * 0:noting
@@ -122,8 +123,8 @@ public class GestureAnalyser {
 //			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
+			paraZ = (finger.tipPosition().getZ()+100)/2;
 			
-			System.out.println("up "+finger.tipPosition().getZ());
 			if(finger.tipPosition().getZ()<-100){
 				drawState = DrawState.DrawPoint;
 				if(mouseState==MouseState.Nothing)
@@ -187,9 +188,6 @@ public class GestureAnalyser {
 	private int analyseGesture(GestureList gestures,Frame frame){
 		for (int i = 0; i < gestures.count(); i++) {
 			Gesture gesture = gestures.get(i);
-			HandList gesHands = gesture.hands();
-			System.out.println(gesHands.count());
-			System.out.println("finger" + frame.fingers().count());
 			switch (gesture.type()) {
 			case TYPE_SCREEN_TAP:
 				this.modeIndex[7]++;
@@ -225,5 +223,8 @@ public class GestureAnalyser {
 	}
 	public double getParaY(){
 		return paraY;
+	}
+	public double getParaZ(){
+		return paraZ;
 	}
 }

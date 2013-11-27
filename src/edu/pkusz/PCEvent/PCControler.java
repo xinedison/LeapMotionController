@@ -7,6 +7,7 @@ public class PCControler {
 	private MouseEvent mouseEvent = new MouseEvent();
 	private MagnifierEvent magnifierEvent = new MagnifierEvent();
 	private DrawFigureEvent drawFigureEvent = new DrawFigureEvent();
+	private MouseRound mouseRound = new MouseRound();
 	private int delaytime = 10;
 	private int mode = 0;	//mode = 0 鼠标模式   mode = 1 放大镜模式   mode = 2 画图模式
 	
@@ -108,6 +109,8 @@ public class PCControler {
 		}
 	}
 	
+	public PCControler(){
+	}
 	/************************************* 
 	* 			Control PPT				 * 
 	*************************************/
@@ -157,11 +160,12 @@ public class PCControler {
 	public boolean mouseMove(int vx,int vy){	//按矢量进行鼠标移动
 		if(mode != 0) return false;
 		mouseEvent.move(vx, vy);
+		mouseRound.startRound();
 		return true;
 	}
 	public boolean mouseMoveTo(int x,int y){	//按坐标进行鼠标移动
 		if(mode != 0) return false;
-		mouseEvent.moveTo(x, y);
+		mouseEvent.moveTo(x, y);		
 		return true;
 	}
 	public boolean rightClick(){		//右键
@@ -203,6 +207,10 @@ public class PCControler {
 		mouseEvent.wheel(w);
 		return true;
 	}
+	public boolean setRound(int z){
+		mouseRound.setRadius(z);
+		return true;
+	}
 	
 	/************************************* 
 	* 			Enlarge Screen			 * 
@@ -211,12 +219,14 @@ public class PCControler {
 		if(mode == 1) return false;
 		mode = 1;
 		magnifierEvent.startMagnifier();
+		mouseRound.endRound();
 		return true;
 	}
 	public boolean endMagnifier(){		//结束放大镜模式，开始鼠标控制模式，mode=0 
 		if(mode != 1) return false;
 		mode = 0;
 		magnifierEvent.endMagnifier();
+		mouseRound.startRound();
 		return true;
 	}
 	public boolean moveMagnifier(int vx,int vy){	//按矢量进行放大镜移动

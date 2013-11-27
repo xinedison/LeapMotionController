@@ -10,7 +10,9 @@ public class EventCaller {
 	public DrawState drawState = DrawState.Nothing;
 	private int x;
 	private int y;
+	private int z;
 	private PCControler pcControler = new PCControler();
+	public EventCaller(){}
 	public boolean callMouseState(MouseState state){
 		this.state = state;
 		switch(state){
@@ -48,6 +50,7 @@ public class EventCaller {
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
+			pcControler.setRound(z);
 			break;
 		case Mode.RightClk:
 			pcControler.rightClick();
@@ -67,8 +70,9 @@ public class EventCaller {
 		}
 		return true;
 	}
-	public void setParam(int x,int y){
+	public void setParam(int x,int y,int z){
 		this.x = x;
 		this.y = y;
+		this.z = z;
 	}
 }

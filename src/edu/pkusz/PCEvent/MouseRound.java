@@ -20,7 +20,7 @@ public class MouseRound extends JFrame{
 	private int windowWidth = 120;
 	private int windowHeight = 120;
 	private boolean startRnd = false;
-	private MouseRoundThread rndThread;
+	private MouseRoundThread rndThread = null;
 	
 	public static void main(String[] args){
 		MouseRound mouseRound = new MouseRound();
@@ -39,6 +39,7 @@ public class MouseRound extends JFrame{
 		Color background = new Color(0,0,0,0);	//Í¸Ã÷±³¾°
 		this.setBackground(background);
 		this.setFocusableWindowState(false);
+		//startRound();
 	}
 	public boolean startRound(){
 		if(startRnd)
@@ -46,11 +47,12 @@ public class MouseRound extends JFrame{
 		startRnd = true;
 		this.setVisible(true);
 		this.validate();
-		if(rndThread == null)
+		if(rndThread == null){
 			rndThread = new MouseRoundThread();
+			new Thread(rndThread).start();
+		}
 		else
 			rndThread.setFlag(true);
-        new Thread(rndThread).start();
         return true;		
 	}
 	public boolean endRound(){
@@ -77,7 +79,11 @@ public class MouseRound extends JFrame{
 	}
 	class MouseRoundThread implements Runnable{
         public void run(){
+    	//	int i=100;
         	while(this.flag){
+   //     		i--;
+ //       		if(i<-150) i = 100;
+//                setRadius(i);
                 update();
                 try{
                     Thread.sleep(10);
