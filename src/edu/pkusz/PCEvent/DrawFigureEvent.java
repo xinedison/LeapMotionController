@@ -53,9 +53,8 @@ public class DrawFigureEvent extends JFrame{
 			return false;
 		startFig = true;
 		figurePanel.clear();
-		delay(50);
-		this.drawPoint(0,0);
 		this.setVisible(true);
+		this.drawPoint(0,0);
 //		if(drawThread == null)
 //			drawThread = new DrawThread();
 //		else

@@ -10,6 +10,7 @@ import com.leapmotion.leap.FingerList;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
 import com.leapmotion.leap.GestureList;
+import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.HandList;
 import com.leapmotion.leap.KeyTapGesture;
 import com.leapmotion.leap.ScreenTapGesture;
@@ -100,21 +101,28 @@ public class GestureAnalyser {
 	public int analyseFrame(Frame frame){
 		//分析识别到的手势信息,如果有gesture，分析gesture
 		GestureList gestures = frame.gestures();
-		if(!gestures.isEmpty())
+		if(!gestures.isEmpty())//分析系统提供的手势信息调用
 			analyseGesture(gestures,frame);
-		//如果有手的信息，分析手
-//		else if (!frame.hands().isEmpty()) {
-//			analyseHands(frame.hands());
-//		}
-//		else 
-		if(!frame.fingers().isEmpty()){  //如果没有gesture，而有手指在
+		if (!frame.hands().isEmpty()) {//分析手的信息
+			analyseHands(frame.hands());
+		}
+		if(!frame.fingers().isEmpty()){  //分析手指信息
 			analyseFingers(frame.fingers());
 		}
-//        mode = 1;
         return mode;
 	}
 	private void analyseHands(HandList hands){
-		
+		if(hands.count()==2){//如果有两支手
+			Hand leftHand = hands.leftmost();
+			Hand rightHand = hands.rightmost();
+			int judgeV = 50;
+			if(leftHand.fingers().count()==1&&leftHand.fingers().count()==rightHand.fingers().count()){//每只手一个指头
+				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV)//两手合并
+					this.modeIndex[Mode.EndMagnifier]++;
+				if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV)
+					this.modeIndex[Mode.StartMagnifier]++;
+			}
+		}
 	}
 	private void analyseFingers(FingerList fingers){
 		if(fingers.count()==1){		//1根手指
@@ -123,8 +131,12 @@ public class GestureAnalyser {
 //			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
 			paraX = fingerDir.getX();
 			paraY = fingerDir.getY();
+			//如果x,y方向速度较小，并且z方向速度较大，视为点击，屏幕坐标不动
+			if(Math.abs(fingerDir.getZ())>50&&(Math.abs(paraX)+Math.abs(paraY))<200){
+				paraX = 0;
+				paraY = 0;
+			}
 			paraZ = (finger.tipPosition().getZ()+100)/2;
-			
 			if(finger.tipPosition().getZ()<-100){
 				drawState = DrawState.DrawPoint;
 				if(mouseState==MouseState.Nothing)
@@ -196,10 +208,10 @@ public class GestureAnalyser {
 				SwipeGesture swipe = new SwipeGesture(gesture);
 				int direction = swipeDirection(swipe.direction());
 				if (direction == 1) {
-					this.modeIndex[3]++;
+					this.modeIndex[4]++;
 					this.mode = Mode.Nothing;
 				} else if (direction == 2) {
-					this.modeIndex[4]++;
+					this.modeIndex[3]++;
 					this.mode = Mode.Nothing;
 				} else if (direction == 5) {
 					this.modeIndex[1]++;
@@ -214,6 +226,7 @@ public class GestureAnalyser {
 					this.modeIndex[16]++;
 					this.mode = Mode.Nothing;
 				}
+			default :return mode;
 			}
 		}
 		return mode;

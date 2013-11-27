@@ -49,8 +49,10 @@ public class MagnifierEvent extends JFrame{
 		this.setZoom(magnifierZoom);
 		this.setSize(magnifierSize);
 		this.setVisible(true);
-		if(magThread == null)
+		this.moveMagnifier(0, 0);
+		if(magThread == null){
 			magThread = new MagnifierThread();
+		}
 		else
 			magThread.setFlag(true);
         new Thread(magThread).start();

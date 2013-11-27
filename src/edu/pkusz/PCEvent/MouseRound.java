@@ -49,10 +49,10 @@ public class MouseRound extends JFrame{
 		this.validate();
 		if(rndThread == null){
 			rndThread = new MouseRoundThread();
-			new Thread(rndThread).start();
 		}
 		else
 			rndThread.setFlag(true);
+		new Thread(rndThread).start();
         return true;		
 	}
 	public boolean endRound(){
@@ -79,11 +79,7 @@ public class MouseRound extends JFrame{
 	}
 	class MouseRoundThread implements Runnable{
         public void run(){
-    	//	int i=100;
         	while(this.flag){
-   //     		i--;
- //       		if(i<-150) i = 100;
-//                setRadius(i);
                 update();
                 try{
                     Thread.sleep(10);

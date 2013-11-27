@@ -1,6 +1,5 @@
 package edu.pkusz.gestureAnalysis;
 
-import java.awt.event.KeyEvent;
 
 import edu.pkusz.PCEvent.PCControler;
 
@@ -50,6 +49,7 @@ public class EventCaller {
 //			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
+			pcControler.moveMagnifier(x/20, -y/20);
 			pcControler.setRound(z);
 			break;
 		case Mode.RightClk:
@@ -65,6 +65,14 @@ public class EventCaller {
 		case Mode.EndFigure:
 			pcControler.endFigure();
 			System.out.println("end figure");
+			break;
+		case Mode.StartMagnifier:
+			pcControler.startMagnifier();
+			System.out.println("start magnifier");
+			break;
+		case Mode.EndMagnifier:
+			pcControler.endMagnifier();
+			System.out.println("end magnifier");
 			break;
 		default :break;
 		}
