@@ -11,7 +11,7 @@ public class DrawFigureEvent extends JFrame{
 	private FigurePanel figurePanel = new FigurePanel();
 	private Container container = getContentPane();	
 	private Color color = new Color(255,0,0);
-	private float stroke = 3f;
+	private float stroke = 5f;
 	private int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
 	private int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 //	private int windowWidth = 500;
@@ -54,7 +54,7 @@ public class DrawFigureEvent extends JFrame{
 		startFig = true;
 		figurePanel.clear();
 		this.setVisible(true);
-		this.drawPoint(0,0);
+		this.drawPoint(0);
 //		if(drawThread == null)
 //			drawThread = new DrawThread();
 //		else
@@ -81,9 +81,17 @@ public class DrawFigureEvent extends JFrame{
 		if(!startFig)
 			return false;
 //		figurePanel.drawRec(x, y, x+(int)stroke, y+(int)stroke,color,stroke);
-		figurePanel.drawRec(java.awt.MouseInfo.getPointerInfo().getLocation().x,
+		figurePanel.drawOval(java.awt.MouseInfo.getPointerInfo().getLocation().x,
 											java.awt.MouseInfo.getPointerInfo().getLocation().y,
 											(int)stroke, (int)stroke,color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
+	public boolean drawPoint(int x){
+		if(!startFig)
+			return false;
+//		figurePanel.drawRec(x, y, x+(int)stroke, y+(int)stroke,color,stroke);
+		figurePanel.drawOval(x,x,(int)stroke, (int)stroke,color,stroke);
 		validate();    // 更新所有子控件
 		return true;
 	}
@@ -91,7 +99,10 @@ public class DrawFigureEvent extends JFrame{
 		if(!startFig)
 			return false;
 //		figurePanel.drawRec(x, y, x+(int)stroke, y+(int)stroke,color,stroke);
-		figurePanel.drawRec(x, y, (int)stroke, (int)stroke,color,stroke);
+		figurePanel.drawLine(x, y, 
+											 java.awt.MouseInfo.getPointerInfo().getLocation().x,
+											 java.awt.MouseInfo.getPointerInfo().getLocation().y,
+											 color,stroke);
 		validate();    // 更新所有子控件
 		return true;
 	}
@@ -126,7 +137,7 @@ public class DrawFigureEvent extends JFrame{
                 try{
                 	drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
    					 java.awt.MouseInfo.getPointerInfo().getLocation().y);
-                	delay(1);
+//                	delay(1);
                 }catch(Exception e){
                     e.printStackTrace();
                 }

@@ -38,10 +38,10 @@ public class GestureAnalyser {
 	 * 16:figureModeEnd
 	 * 17:drawPoint	
 	*/
-	private double fingerPosX = 0f;			//descripe the single finger position
-	private double fingerPosY = 0f;
-	private double fingerPosZ = 0f;
+	private double fingerSpeedX = 0f;			//descripe the single finger position
+	private double fingerSpeedY = 0f;
 	
+	private double fingerPosZ = 0f;
 	private double handsDistance = 0f;
 	
 	private double zoomRate = 0f;
@@ -135,6 +135,12 @@ public class GestureAnalyser {
 				this.mode = Mode.MagnifierResize;
 			}
 		}
+		else if(hands.count()==1){
+			Hand hand  = hands.get(0);
+			System.out.println("normal"+hand.palmNormal()+"\tRadius"+hand.sphereRadius()+"\tCenter"+hand.sphereCenter());
+		}
+		else 
+			this.mode = Mode.Nothing;
 	}
 	/**
 	 * 分析手指的动作及移动方向信息
@@ -145,12 +151,12 @@ public class GestureAnalyser {
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
 //			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
-			fingerPosX = fingerDir.getX();
-			fingerPosY = fingerDir.getY();
+			fingerSpeedX = fingerDir.getX();
+			fingerSpeedY = fingerDir.getY();
 			//如果x,y方向速度较小，并且z方向速度较大，视为点击，屏幕坐标不动
-			if(Math.abs(fingerDir.getZ())>50&&(Math.abs(fingerPosX)+Math.abs(fingerPosY))<200){
-				fingerPosX = 0;
-				fingerPosY = 0;
+			if(Math.abs(fingerDir.getZ())>50&&(Math.abs(fingerSpeedX)+Math.abs(fingerSpeedY))<200){
+				fingerSpeedX = 0;
+				fingerSpeedY = 0;
 			}
 			fingerPosZ = (finger.tipPosition().getZ()+100)/2;
 			if(finger.tipPosition().getZ()<-100){
@@ -238,11 +244,11 @@ public class GestureAnalyser {
 					this.mode = Mode.Nothing;
 					break;
 				case in:
-					this.modeIndex[Mode.EndShow]++;
+					this.modeIndex[Mode.PageUp]++;
 					this.mode = Mode.Nothing;
 					break;
 				case out:
-					this.modeIndex[Mode.StartShow]++;
+					this.modeIndex[Mode.PageDown]++;
 					this.mode = Mode.Nothing;
 					break;
 				default :break;
@@ -254,13 +260,13 @@ public class GestureAnalyser {
 	private void update(Frame preFrame){
 			this.preFrame = preFrame;
 	}
-	public double getParaX(){
-		return fingerPosX;
+	public double getSpeedX(){
+		return fingerSpeedX;
 	}
-	public double getParaY(){
-		return fingerPosY;
+	public double getSpeedY(){
+		return fingerSpeedY;
 	}
-	public double getParaZ(){
+	public double getPosZ(){
 		return fingerPosZ;
 	}
 	public MouseState getMouseState(){

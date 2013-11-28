@@ -7,7 +7,6 @@ import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
 import com.leapmotion.leap.Listener;
-import com.leapmotion.leap.Vector;
 
 import edu.pkusz.gestureAnalysis.DrawState;
 import edu.pkusz.gestureAnalysis.EventCaller;
@@ -69,8 +68,8 @@ public class LMListener extends Listener {
 	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
 	        if(tempmode == Mode.MouseMove){//如果是鼠标移动的话
 	        	this.mode = tempmode;
-	        	double x = gesAnalyser.getParaX();
-	        	double y = gesAnalyser.getParaY();
+	        	double x = gesAnalyser.getSpeedX();
+	        	double y = gesAnalyser.getSpeedY();
 	    		if((int)(preParaX*10) ==(int)(x*10))
 	    			x = 0;
 	    		else
@@ -79,7 +78,7 @@ public class LMListener extends Listener {
 	    			y = 0;
 	    		else
 	    			preParaY = y;
-	    		caller.setParam((int)x,(int) y,(int)gesAnalyser.getParaZ());
+	    		caller.setParam((int)x,(int) y,(int)gesAnalyser.getPosZ());
 	        	caller.callEvent(this.mode);
 	       
 	        	mouseState = gesAnalyser.getMouseState();//移动手指

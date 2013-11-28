@@ -12,6 +12,9 @@ public class EventCaller {
 	private int y;
 	private int z;
 	private int magResize;
+	//ÆÁÄ»µÄ³¤¿í
+	private int screenHeight = 768;
+	private int screenWidth = 1024;
 	private int magZoomRate;
 	private PCControler pcControler = new PCControler();
 	public EventCaller(){}
@@ -49,7 +52,6 @@ public class EventCaller {
 			System.out.println("pageup");
 			break;
 		case Mode.MouseMove:
-//			System.out.println(x+"\t"+y);
 			pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
 			pcControler.moveMagnifier(x/20, -y/20);
@@ -78,7 +80,7 @@ public class EventCaller {
 			System.out.println("end magnifier");
 			break;
 		case Mode.MagnifierResize:
-			pcControler.resizeMagnifier(magState.getState()*magResize/25);
+			pcControler.resizeMagnifier(magState.getState()*magResize/50);
 		default :break;
 		}
 		return true;

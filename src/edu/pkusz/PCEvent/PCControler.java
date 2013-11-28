@@ -262,9 +262,11 @@ public class PCControler {
 	}
 	public boolean drawPoint(int x,int y,int drawState){	//在x,y坐标处画点 
 		if(mode != 2) return false;
+		int lastX = java.awt.MouseInfo.getPointerInfo().getLocation().x;
+		int lastY = java.awt.MouseInfo.getPointerInfo().getLocation().y;
 		drawFigureEvent.mouseMove(x, y);
 		if(drawState==1)
-			drawFigureEvent.drawPoint();
+			drawFigureEvent.drawPoint(lastX,lastY);
 		return true;
 	}
 	
