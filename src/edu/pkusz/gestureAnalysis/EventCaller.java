@@ -6,10 +6,13 @@ import edu.pkusz.PCEvent.PCControler;
 public class EventCaller {
 	private int mode;
 	private MouseState state;
-	public DrawState drawState = DrawState.Nothing;
+	private MagnifierState magState;
+	private DrawState drawState = DrawState.Nothing;
 	private int x;
 	private int y;
 	private int z;
+	private int magResize;
+	private int magZoomRate;
 	private PCControler pcControler = new PCControler();
 	public EventCaller(){}
 	public boolean callMouseState(MouseState state){
@@ -74,6 +77,8 @@ public class EventCaller {
 			pcControler.endMagnifier();
 			System.out.println("end magnifier");
 			break;
+		case Mode.MagnifierResize:
+			pcControler.resizeMagnifier(magState.getState()*magResize/25);
 		default :break;
 		}
 		return true;
@@ -82,5 +87,15 @@ public class EventCaller {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+	public void setMagParam(double resize,double zoomRate){
+		this.magResize = (int)resize;
+		this.magZoomRate = (int)zoomRate;
+	}
+	public void setDrawState(DrawState drawState){
+		this.drawState = drawState;
+	}
+	public void setMagState(MagnifierState magState){
+		this.magState = magState;
 	}
 }

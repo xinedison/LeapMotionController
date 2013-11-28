@@ -12,6 +12,7 @@ import com.leapmotion.leap.Vector;
 import edu.pkusz.gestureAnalysis.DrawState;
 import edu.pkusz.gestureAnalysis.EventCaller;
 import edu.pkusz.gestureAnalysis.GestureAnalyser;
+import edu.pkusz.gestureAnalysis.MagnifierState;
 import edu.pkusz.gestureAnalysis.Mode;
 import edu.pkusz.gestureAnalysis.MouseState;
 
@@ -19,6 +20,7 @@ public class LMListener extends Listener {
 	private int mode = Mode.Nothing;
 	private MouseState mouseState = MouseState.Nothing;	//鼠标状态
 	public DrawState drawState = DrawState.Nothing;	//画图状态
+	private MagnifierState magState = MagnifierState.Nothing;
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
@@ -41,18 +43,6 @@ public class LMListener extends Listener {
         controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
         controller.enableGesture(Gesture.Type.TYPE_SCREEN_TAP);
         controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
-//        // config of the leap motion  parameter
-//        Config config = controller.config();
-//     // key tap parameters
-//        config.setFloat("Gesture.KeyTap.MinDownVelocity", 30.0f);
-//        // screen tap parameters
-//        config.setFloat("Gesture.ScreenTap.MinForwardVelocity", 30.0f);
-//        config.setFloat("Gesture.ScreenTap.MinDistance", 1.0f);
-//        //config the swipe gesture parameter
-////        controller.config().setFloat("Gesture.Swipe.MinLength", 200.0f) ;
-////        controller.config().setFloat("Gesture.Swipe.MinVelocity", 750);
-//        //save the config change
-//        controller.config().save();
         this.gesAnalyser = new GestureAnalyser(controller);
     }
 
@@ -70,14 +60,14 @@ public class LMListener extends Listener {
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
-        if(frame.fingers().count()==0){//当前如果没有手指的话，将上次缓存动作实施
+        if(frame.fingers().count()==0){//当前如果没有检测到手指的话，将之前检测到的一系列动作分析为一个连贯动作，找出意图实施
         	this.mode = gesAnalyser.getBestMode();
         	gesAnalyser.clearModeIndex();
 	//        caller.setParam((int)mv.getX(), (int)mv.getY());
         	caller.callEvent(this.mode);
     	}else{	//有手指
 	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
-	        if(tempmode == Mode.MouseMove){
+	        if(tempmode == Mode.MouseMove){//如果是鼠标移动的话
 	        	this.mode = tempmode;
 	        	double x = gesAnalyser.getParaX();
 	        	double y = gesAnalyser.getParaY();
@@ -91,22 +81,31 @@ public class LMListener extends Listener {
 	    			preParaY = y;
 	    		caller.setParam((int)x,(int) y,(int)gesAnalyser.getParaZ());
 	        	caller.callEvent(this.mode);
+	       
+	        	mouseState = gesAnalyser.getMouseState();//移动手指
+	        	drawState = gesAnalyser.getDrawState();
+	        	caller.setDrawState(drawState);
+	        	if(mouseState!=MouseState.Nothing){
+	        		caller.callMouseState(mouseState);
+	        	}
 	        }
-	        mouseState = gesAnalyser.getMouseState();
-	        drawState = gesAnalyser.getDrawState();
-	        caller.drawState = drawState;
-	        if(mouseState!=MouseState.Nothing){
-	        	caller.callMouseState(mouseState);
+	        if(tempmode == Mode.MagnifierResize){
+	        	this.mode = tempmode;
+	        	this.magState = gesAnalyser.getMagState();
+	        	double handsDis = gesAnalyser.getHandsDistance();
+	        	double zoomRate = gesAnalyser.getZoomRate();
+	        	caller.setMagParam(handsDis,zoomRate);//设置
+	        	caller.setMagState(magState);
+	        	if(magState!=MagnifierState.Nothing)//需要调整缩放比例
+	        		caller.callEvent(this.mode);
 	        }
         }
     }
     
 	public static void main(String[] args){
-//		MainController mainController = new MainController();
 		LMListener listener = new LMListener();
 		Controller controller = new Controller();
 		controller.addListener(listener);
-		//while(true);
 		 try {
 	            System.in.read();
 	        } catch (IOException e) {

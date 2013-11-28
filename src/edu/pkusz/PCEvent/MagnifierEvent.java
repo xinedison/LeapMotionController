@@ -204,8 +204,6 @@ class MagnifierPanel extends JPanel
 	    height = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
 	    height = magnifierSize*(height/width);
 	    width = magnifierSize;
-	    System.out.println(width);
-	    System.out.println(height);
     }
     public void paintComponent(Graphics g){
 	    super.paintComponent((Graphics2D) g);
