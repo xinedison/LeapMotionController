@@ -2,6 +2,8 @@ package edu.pkusz.gestureAnalysis;
 
 
 
+import java.util.Iterator;
+
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Finger;
 import com.leapmotion.leap.FingerList;
@@ -112,23 +114,21 @@ public class GestureAnalyser {
 		if(hands.count()==2){//如果有两支手
 			Hand leftHand = hands.leftmost();
 			Hand rightHand = hands.rightmost();
-			int judgeV = 50;
+			int judgeV = 20;
 			if(leftHand.fingers().count()==1&&leftHand.fingers().count()==rightHand.fingers().count()){//每只手一个指头
-				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV)//两手横向合并
+				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手横向合并
 					this.modeIndex[Mode.EndMagnifier]++;
-				else if(leftHand.palmVelocity().getY()>judgeV&&rightHand.palmVelocity().getY()<-judgeV)//两手纵向合并
-					this.modeIndex[Mode.EndMagnifier]++;
-				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV)//两手横向分开
+				}
+				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){//两手横向分开
 					this.modeIndex[Mode.StartMagnifier]++;
-				else if(leftHand.palmVelocity().getY()<-judgeV&&rightHand.palmVelocity().getY()>judgeV)//两手纵向分开
-					this.modeIndex[Mode.StartMagnifier]++;
+				}
 			}
 			else if(leftHand.fingers().count()>=3&&rightHand.fingers().count()>=3){//当两支手都检测到多个手指，认为是调整放大镜大小
 				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手合并
 					this.magState = MagnifierState.Shrink;
 					this.handsDistance = rightHand.palmPosition().getX()-leftHand.palmPosition().getX();
 				}
-				if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){
+				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){
 					this.magState = MagnifierState.Enlarge;
 					this.handsDistance = rightHand.palmPosition().getX()-leftHand.palmPosition().getX();
 				}
@@ -136,8 +136,28 @@ public class GestureAnalyser {
 			}
 		}
 		else if(hands.count()==1){
-			Hand hand  = hands.get(0);
-			System.out.println("normal"+hand.palmNormal()+"\tRadius"+hand.sphereRadius()+"\tCenter"+hand.sphereCenter());
+			if(hands.get(0).fingers().count()==2){//调整放大镜缩放大小
+				FingerList fingers = hands.get(0).fingers();
+				Finger frontFinger = fingers.frontmost();
+				Finger farToScreenFinger = null;
+				for(Iterator<Finger> it=fingers.iterator();it.hasNext();){//取出后面的手指
+					farToScreenFinger = it.next();
+					if(farToScreenFinger.id()!=frontFinger.id())
+						break;
+				}
+				int judgeV = 20;
+				if(frontFinger.tipVelocity().getZ()>judgeV&&farToScreenFinger.tipVelocity().getZ()<-judgeV){
+					this.magState = MagnifierState.Shrink;
+					this.zoomRate = farToScreenFinger.tipPosition().getZ()-frontFinger.tipPosition().getZ();
+					this.modeIndex[Mode.MagnifierZoom]++;
+				}
+				else if(frontFinger.tipVelocity().getZ()<-judgeV&&farToScreenFinger.tipVelocity().getZ()>judgeV){
+					this.magState = MagnifierState.Enlarge;
+					this.zoomRate = farToScreenFinger.tipPosition().getZ()-frontFinger.tipPosition().getZ();
+					this.modeIndex[Mode.MagnifierZoom]++;
+				}
+				this.mode = Mode.MagnifierZoom;
+			}
 		}
 		else 
 			this.mode = Mode.Nothing;
@@ -179,7 +199,7 @@ public class GestureAnalyser {
 		}
 	}
 	private enum Direction{
-		notJudged,left,right,up,down,in,out;
+		notJudged,left,right,up,down,in,out,leftOut,rightIn;
 	}
 	/**
 	 * 分析手滑动的方向
@@ -195,22 +215,20 @@ public class GestureAnalyser {
 		double z = Math.abs(direction.getZ());
 		if(x>y&&x>z){
 			if(direction.getX()>0)
-				return Direction.left;
-			else
 				return Direction.right;
+			else
+				return Direction.left;
 		}
-		if(y>x&&y>z){
+		else if(y>x&&y>z){
 			if(direction.getY()>0)
 				return Direction.up;
 			else
 				return Direction.down;
 		}
-		if(z>x&&z>y){
-			if(direction.getZ()>0)
-				return Direction.out;
-			else
-				return Direction.in;
-		}
+		if(direction.getX()<0&&direction.getZ()>0)
+			return Direction.leftOut;
+		else if(direction.getX()>0&&direction.getZ()<0)
+			return Direction.rightIn;
 		return Direction.notJudged;
 	}
 	/*
@@ -243,12 +261,12 @@ public class GestureAnalyser {
 					this.modeIndex[Mode.EndFigure]++;
 					this.mode = Mode.Nothing;
 					break;
-				case in:
-					this.modeIndex[Mode.PageUp]++;
+				case leftOut:
+					this.modeIndex[Mode.PageDown]++;
 					this.mode = Mode.Nothing;
 					break;
-				case out:
-					this.modeIndex[Mode.PageDown]++;
+				case rightIn:
+					this.modeIndex[Mode.PageUp]++;
 					this.mode = Mode.Nothing;
 					break;
 				default :break;

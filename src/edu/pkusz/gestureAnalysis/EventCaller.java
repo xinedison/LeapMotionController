@@ -81,6 +81,11 @@ public class EventCaller {
 			break;
 		case Mode.MagnifierResize:
 			pcControler.resizeMagnifier(magState.getState()*magResize/50);
+			break;
+		case Mode.MagnifierZoom:
+			pcControler.zoomMagnifier(magState.getState()*magZoomRate/10);
+			System.out.println("magnifier zoom changed to"+magState.getState()*magZoomRate/10);
+			break;
 		default :break;
 		}
 		return true;

@@ -80,7 +80,6 @@ public class LMListener extends Listener {
 	    			preParaY = y;
 	    		caller.setParam((int)x,(int) y,(int)gesAnalyser.getPosZ());
 	        	caller.callEvent(this.mode);
-	       
 	        	mouseState = gesAnalyser.getMouseState();//移动手指
 	        	drawState = gesAnalyser.getDrawState();
 	        	caller.setDrawState(drawState);
@@ -88,15 +87,20 @@ public class LMListener extends Listener {
 	        		caller.callMouseState(mouseState);
 	        	}
 	        }
-	        if(tempmode == Mode.MagnifierResize){
+	        else if(tempmode == Mode.MagnifierResize){
 	        	this.mode = tempmode;
 	        	this.magState = gesAnalyser.getMagState();
 	        	double handsDis = gesAnalyser.getHandsDistance();
-	        	double zoomRate = gesAnalyser.getZoomRate();
-	        	caller.setMagParam(handsDis,zoomRate);//设置
+	        	caller.setMagParam(handsDis,0);//设置
 	        	caller.setMagState(magState);
 	        	if(magState!=MagnifierState.Nothing)//需要调整缩放比例
 	        		caller.callEvent(this.mode);
+	        }
+	        else if(tempmode==Mode.MagnifierZoom){//调整放大镜缩放比例
+	        	this.magState = gesAnalyser.getMagState();
+	        	double zoomRate = gesAnalyser.getZoomRate();
+	        	caller.setMagState(magState);
+	        	caller.setMagParam(0,zoomRate);//设置
 	        }
         }
     }
