@@ -122,8 +122,10 @@ public class MagnifierEvent extends JFrame{
 		if(!startMag)
 			return false;
 		magnifierZoom+=changedScale;
-		if(magnifierZoom>maxZoom || magnifierZoom<minZoom)
-			magnifierZoom-=changedScale;
+		if(magnifierZoom>maxZoom)
+			magnifierZoom = maxZoom;
+		else if( magnifierZoom<minZoom)
+			magnifierZoom = minZoom;
 		magnifierPanel.setMagnifierScale(magnifierZoom);
 		validate();
 		return true;

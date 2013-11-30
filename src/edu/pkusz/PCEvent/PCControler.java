@@ -47,10 +47,6 @@ public class PCControler {
 			Thread.sleep(1000);
 			pcControler.wheel(-1);
 			
-			
-			
-			
-			
 			//test Magnifier
 			Thread.sleep(5000);
 			pcControler.startShow();

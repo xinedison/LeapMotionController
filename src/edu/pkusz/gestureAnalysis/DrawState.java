@@ -1,6 +1,6 @@
 package edu.pkusz.gestureAnalysis;
 /**
- * the draw state
+ * the draw state记录画图的状态信息
  * 0:nothing
  * 1:draw point
  * 2:draw rec

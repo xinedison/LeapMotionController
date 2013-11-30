@@ -14,12 +14,18 @@ import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.HandList;
 import com.leapmotion.leap.SwipeGesture;
 import com.leapmotion.leap.Vector;
-
+/**
+ * 分析每帧数据中的手势信息，分析后通过设置Mode参数供上层调用
+ * 手势中有实时手势信息以及系列手势信息
+ * 实时手势信息通过返回的mode来说明
+ * 系列手势信息通过多帧frame分析，利用modeIndex来判别其最可能的手势意图
+ */
 
 public class GestureAnalyser {
 	private int mode;
 	private int modeNum = 17;
 	private int[] modeIndex = new int[modeNum];
+
 	/*
 	 * 0:什么也不做
 	 * 1:start show
@@ -46,7 +52,8 @@ public class GestureAnalyser {
 	private double fingerPosZ = 0f;
 	private double handsDistance = 0f;
 	
-	private double zoomRate = 0f;
+	private double magStateCache = 0;
+	
 	private MouseState  mouseState = MouseState.Nothing;	//鼠标状态
 	/*
 	 * 0:noting
@@ -83,6 +90,9 @@ public class GestureAnalyser {
 		for(int i=0;i<modeNum;i++)
 			modeIndex[i] = 0;		
 	}
+	public void clearMagCache(){
+		this.magStateCache = 0;
+	}
 	/**
 	 * 对上一次的一列动作做统计，找出其中最有可能的动作意图
 	 * @return 动作Mode对应的index
@@ -103,12 +113,17 @@ public class GestureAnalyser {
 	public int getMode(){
 		return mode;
 	}
+	/**
+	 * 分析一帧数据，得到这帧的动作意图
+	 * @param frame 当前leap motion 获取的数据帧
+	 * @return 实时的交互mode
+	 */
 	public int analyseFrame(Frame frame){
 		update(controller.frame(1));
 		//分析识别到的手势信息,如果有gesture，分析gesture
 		GestureList gestures = frame.gestures();
 		if(!gestures.isEmpty()&&frame.hands().count()==1)//分析由一只手产生的挥动或者点击动作
-			analyseGesture(gestures,frame);
+			analyseGesture(gestures);
 		if (!frame.hands().isEmpty()) {//分析手的信息
 			analyseHands(frame.hands());
 		}
@@ -118,34 +133,34 @@ public class GestureAnalyser {
         return mode;
 	}
 	private void analyseHands(HandList hands){
-		if(hands.count()==2){//如果有两支手
+		if(hands.count()==2){//分析两只手完成的动作
 			Hand leftHand = hands.leftmost();
 			Hand rightHand = hands.rightmost();
 			int judgeV = 20;
-			if(leftHand.fingers().count()==1&&leftHand.fingers().count()==rightHand.fingers().count()){//每只手一个指头
-				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手横向合并
+			if(leftHand.fingers().count()==1&&leftHand.fingers().count()==rightHand.fingers().count()){//由两只手分别各出一个手指的动作
+				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手横向合并，认为是关闭放大镜
 					this.modeIndex[Mode.EndMagnifier]++;
 				}
-				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){//两手横向分开
+				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){//两手横向分开，认为是打开放大镜
 					this.modeIndex[Mode.StartMagnifier]++;
 				}
 			}
-			else if(leftHand.fingers().count()>=3&&rightHand.fingers().count()>=3){//当两支手都检测到多个手指，认为是调整放大镜大小
-				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手合并
+			else if(leftHand.fingers().count()>=3&&rightHand.fingers().count()>=3){//由两只张开手完成的动作，认为是调整放大镜大小
+				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手合并，减小放大镜大小
 					this.magState = MagnifierState.Shrink;
 					this.handsDistance = rightHand.palmPosition().distanceTo(leftHand.palmPosition());
 				}
-				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){
+				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){//两手分开，增大放大镜大小
 					this.magState = MagnifierState.Enlarge;
 					this.handsDistance = rightHand.palmPosition().distanceTo(leftHand.palmPosition());
 				}
 				this.mode = Mode.MagnifierResize;
 			}
 		}
-		else if(hands.count()==1){
-			if(hands.get(0).fingers().count()==2){//调整放大镜缩放大小
+		else if(hands.count()==1){//由一只手完成动作
+			if(hands.get(0).fingers().count()==2){//两指相对移动，调整放大镜缩放大小
 				FingerList fingers = hands.get(0).fingers();
-				Finger frontFinger = fingers.frontmost();
+				Finger frontFinger = fingers.frontmost();//最靠近屏幕的手指
 				Finger farToScreenFinger = null;
 				for(Iterator<Finger> it=fingers.iterator();it.hasNext();){//取出后面的手指
 					farToScreenFinger = it.next();
@@ -154,28 +169,27 @@ public class GestureAnalyser {
 				}
 				int judgeV = 20;
 				if(frontFinger.tipVelocity().getZ()>judgeV&&farToScreenFinger.tipVelocity().getZ()<-judgeV){
-					this.magState = MagnifierState.Shrink;
-					this.zoomRate = farToScreenFinger.tipPosition().distanceTo(frontFinger.tipPosition());
+					this.magStateCache += MagnifierState.Shrink.getState();
 					this.modeIndex[Mode.MagnifierZoom]++;
 				}
 				else if(frontFinger.tipVelocity().getZ()<-judgeV&&farToScreenFinger.tipVelocity().getZ()>judgeV){
-					this.magState = MagnifierState.Enlarge;
-					this.zoomRate = farToScreenFinger.tipPosition().distanceTo(frontFinger.tipPosition());
+					this.magStateCache += MagnifierState.Enlarge.getState();
 					this.modeIndex[Mode.MagnifierZoom]++;
 				}
-				this.mode = Mode.MagnifierZoom;
 			}
-			else if(hands.get(0).fingers().count()>=4){
+			else if(hands.get(0).fingers().count()>=4){//单手握拳或分开
 				Hand curHand = hands.get(0);
 				int id = curHand.id();
 				Hand preHand = preFrame.hand(id);
 				int preFingerCount = preHand.fingers().count();
 				if(preFingerCount>=4){//上一帧也有大于四指
 					double handMoveDis = preHand.palmPosition().distanceTo(curHand.palmPosition());
-					if(handMoveDis<5&&preHand.fingers().frontmost().tipVelocity().getZ()<-100){//五指合并结束放映
+					Vector frontFingerV = preHand.fingers().rightmost().tipVelocity();
+					int judgeV = 100;
+					if(handMoveDis<5&&frontFingerV.getZ()<-judgeV&&frontFingerV.getY()<-judgeV){//五指合并结束放映
 						this.modeIndex[Mode.EndShow]++;
 					}
-					else if(handMoveDis<5&&preHand.fingers().frontmost().tipVelocity().getZ()>200){//五指张开开始放映
+					else if(handMoveDis<5&&frontFingerV.getZ()>judgeV&&frontFingerV.getY()>judgeV){//五指张开开始放映
 						this.modeIndex[Mode.StartShow]++;
 					}
 				}
@@ -246,16 +260,16 @@ public class GestureAnalyser {
 			else
 				return Direction.down;
 		}
-		if(direction.getX()<0&&direction.getZ()>0)
-			return Direction.leftOut;
+//		if(direction.getX()<0&&direction.getZ()>0)
+//			return Direction.leftOut;
 		else if(direction.getX()>0&&direction.getZ()<0)
 			return Direction.rightIn;
 		return Direction.notJudged;
 	}
-	/*
-	 * analyse the gestures leap motion percepted
+	/**
+	 * 分析由leap motion提供的手势数据
 	 */
-	private void analyseGesture(GestureList gestures,Frame frame){
+	private void analyseGesture(GestureList gestures){
 		for (int i = 0; i < gestures.count(); i++) {
 			Gesture gesture = gestures.get(i);
 			switch (gesture.type()) {
@@ -282,10 +296,10 @@ public class GestureAnalyser {
 					this.modeIndex[Mode.EndFigure]++;
 					this.mode = Mode.Nothing;
 					break;
-				case leftOut:
-					this.modeIndex[Mode.PageDown]++;
-					this.mode = Mode.Nothing;
-					break;
+//				case leftOut:
+//					this.modeIndex[Mode.PageDown]++;
+//					this.mode = Mode.Nothing;
+//					break;
 				case rightIn:
 					this.modeIndex[Mode.PageUp]++;
 					this.mode = Mode.Nothing;
@@ -317,10 +331,15 @@ public class GestureAnalyser {
 	public MagnifierState getMagState(){
 		return magState;
 	}
+	public MagnifierState getMagZoomState(){
+		double zoomStateJudge = this.magStateCache/this.modeIndex[Mode.MagnifierZoom];
+		if(zoomStateJudge>0)
+			return MagnifierState.Enlarge;
+		else if(zoomStateJudge<0)
+			return MagnifierState.Shrink;
+		return MagnifierState.Nothing;
+	}
 	public double getHandsDistance(){
 		return handsDistance;
-	}
-	public double getZoomRate(){
-		return zoomRate;
 	}
 }
