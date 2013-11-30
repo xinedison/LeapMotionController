@@ -76,10 +76,17 @@ public class GestureAnalyser {
 	public GestureAnalyser(Controller controller){
 		this.controller = controller;
 	}
+	/**
+	 * 清楚计数器
+	 */
 	public void clearModeIndex(){	//调用即意味着一次gesture的开始
 		for(int i=0;i<modeNum;i++)
 			modeIndex[i] = 0;		
 	}
+	/**
+	 * 对上一次的一列动作做统计，找出其中最有可能的动作意图
+	 * @return 动作Mode对应的index
+	 */
 	public int getBestMode(){	//调用以计算一次gesture结束时的最终结果
 		int maxMode = 0;
 		mode = Mode.Nothing;
@@ -126,11 +133,11 @@ public class GestureAnalyser {
 			else if(leftHand.fingers().count()>=3&&rightHand.fingers().count()>=3){//当两支手都检测到多个手指，认为是调整放大镜大小
 				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手合并
 					this.magState = MagnifierState.Shrink;
-					this.handsDistance = rightHand.palmPosition().getX()-leftHand.palmPosition().getX();
+					this.handsDistance = rightHand.palmPosition().distanceTo(leftHand.palmPosition());
 				}
 				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){
 					this.magState = MagnifierState.Enlarge;
-					this.handsDistance = rightHand.palmPosition().getX()-leftHand.palmPosition().getX();
+					this.handsDistance = rightHand.palmPosition().distanceTo(leftHand.palmPosition());
 				}
 				this.mode = Mode.MagnifierResize;
 			}
@@ -148,15 +155,30 @@ public class GestureAnalyser {
 				int judgeV = 20;
 				if(frontFinger.tipVelocity().getZ()>judgeV&&farToScreenFinger.tipVelocity().getZ()<-judgeV){
 					this.magState = MagnifierState.Shrink;
-					this.zoomRate = farToScreenFinger.tipPosition().getZ()-frontFinger.tipPosition().getZ();
+					this.zoomRate = farToScreenFinger.tipPosition().distanceTo(frontFinger.tipPosition());
 					this.modeIndex[Mode.MagnifierZoom]++;
 				}
 				else if(frontFinger.tipVelocity().getZ()<-judgeV&&farToScreenFinger.tipVelocity().getZ()>judgeV){
 					this.magState = MagnifierState.Enlarge;
-					this.zoomRate = farToScreenFinger.tipPosition().getZ()-frontFinger.tipPosition().getZ();
+					this.zoomRate = farToScreenFinger.tipPosition().distanceTo(frontFinger.tipPosition());
 					this.modeIndex[Mode.MagnifierZoom]++;
 				}
 				this.mode = Mode.MagnifierZoom;
+			}
+			else if(hands.get(0).fingers().count()>=4){
+				Hand curHand = hands.get(0);
+				int id = curHand.id();
+				Hand preHand = preFrame.hand(id);
+				int preFingerCount = preHand.fingers().count();
+				if(preFingerCount>=4){//上一帧也有大于四指
+					double handMoveDis = preHand.palmPosition().distanceTo(curHand.palmPosition());
+					if(handMoveDis<5&&preHand.fingers().frontmost().tipVelocity().getZ()<-100){//五指合并结束放映
+						this.modeIndex[Mode.EndShow]++;
+					}
+					else if(handMoveDis<5&&preHand.fingers().frontmost().tipVelocity().getZ()>200){//五指张开开始放映
+						this.modeIndex[Mode.StartShow]++;
+					}
+				}
 			}
 		}
 		else 
@@ -170,7 +192,6 @@ public class GestureAnalyser {
 		if(fingers.count()==1){		//1根手指，则设置为移动状态
 			Finger finger = fingers.get(0);
 			Vector fingerDir = finger.tipVelocity();
-//			System.out.println("shang x"+fingerDir.getX()+"\tshang y"+fingerDir.getY());
 			fingerSpeedX = fingerDir.getX();
 			fingerSpeedY = fingerDir.getY();
 			//如果x,y方向速度较小，并且z方向速度较大，视为点击，屏幕坐标不动
