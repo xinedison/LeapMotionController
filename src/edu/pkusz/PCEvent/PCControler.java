@@ -8,8 +8,9 @@ public class PCControler {
 	private MagnifierEvent magnifierEvent = new MagnifierEvent();
 	private DrawFigureEvent drawFigureEvent = new DrawFigureEvent();
 	private MouseRound mouseRound = new MouseRound();
+	private MusicEvent musicEvent = new MusicEvent();
 	private int delaytime = 10;
-	private int mode = 0;	//mode = 0 鼠标模式   mode = 1 放大镜模式   mode = 2 画图模式
+	private int mode = 0;	//mode = 0 鼠标模式   mode = 1 放大镜模式   mode = 2 画图模式 mode = 3音乐模式
 	
 	public static void main(String[] args){
 		PCControler pcControler = new PCControler();
@@ -272,5 +273,37 @@ public class PCControler {
 		return true;
 	}
 	
-	
+	/************************************* 
+	* 				Music				 * 
+	*************************************/	
+	public boolean startMusic(){		//开始音乐模式，mode=3 
+//		if(mode == 2) return false;
+		if(mode == 0){
+			mode = 3;
+			musicEvent.startMusic();
+			return true;
+		}
+		return false;
+	}
+	public boolean endMusic(){			//结束音乐模式，开始鼠标控制模式，mode=0 
+		if(mode != 3) return false;
+		mode = 0;
+		musicEvent.endMusic();
+		return true;
+	}
+	public boolean startBackground(){
+		if(mode != 3) return false;
+		musicEvent.startBackground();
+		return true;
+	}
+	public boolean endBackground(){
+		if(mode != 3) return false;
+		musicEvent.endBackground();
+		return true;
+	}
+	public boolean setMusicVolume(double volume){
+		if(mode != 3) return false;
+		musicEvent.setVolume(volume);
+		return true;
+	}
 }

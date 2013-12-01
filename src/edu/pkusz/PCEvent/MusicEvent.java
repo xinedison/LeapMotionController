@@ -111,11 +111,11 @@ public class MusicEvent extends JFrame{
 		}
 		return false;
 	}
-	public boolean setVolume(float volume){
+	public boolean setVolume(double volume){
 		if(state==0)
 			return false;
 
-		player.getGainControl().setLevel(volume);
+		player.getGainControl().setLevel((float)volume);
 		return true;
 	}
 	public boolean nextBackground(){
