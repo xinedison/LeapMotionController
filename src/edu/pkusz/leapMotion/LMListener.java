@@ -8,6 +8,7 @@ import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
 import com.leapmotion.leap.Listener;
 
+import edu.pkusz.PCEvent.ControlFrame;
 import edu.pkusz.gestureAnalysis.DrawState;
 import edu.pkusz.gestureAnalysis.EventCaller;
 import edu.pkusz.gestureAnalysis.GestureAnalyser;
@@ -28,7 +29,8 @@ public class LMListener extends Listener {
 	private double preParaX = 0f;
 	private double preParaY = 0f;
 	private GestureAnalyser gesAnalyser;
-	private EventCaller caller = null;
+	public EventCaller caller = null;
+	private static ControlFrame controlFrame = null;
 	
 	public LMListener(){
 		if(caller == null)
@@ -117,7 +119,10 @@ public class LMListener extends Listener {
 	public static void main(String[] args){
 		LMListener listener = new LMListener();
 		Controller controller = new Controller();
+		controlFrame = new ControlFrame(listener.caller);
+		controlFrame.startFrame();
 		controller.addListener(listener);
+		
 		 try {
 	            System.in.read();
 	        } catch (IOException e) {

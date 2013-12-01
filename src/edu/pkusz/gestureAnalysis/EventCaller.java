@@ -93,6 +93,10 @@ public class EventCaller {
 			bSucceed = pcControler.zoomMagnifier(magState.getState());
 			System.out.println("magnifier zoom changed "+magState.getState());
 			break;
+		case Mode.MouseModeStart:
+			bSucceed = pcControler.startMouse();
+			System.out.println("mouse mode start");
+			break;
 		default :break;
 		}
 		return bSucceed;

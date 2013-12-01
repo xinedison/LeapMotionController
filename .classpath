@@ -7,5 +7,11 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="LeapMotionController/lib/x86"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/mp3plugin.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/customizer.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/jmf.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/mediaplayer.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/multiplayer.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Java/jdk1.7.0_45/lib/sound.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

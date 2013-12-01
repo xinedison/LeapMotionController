@@ -11,7 +11,11 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.*;
 
+import edu.pkusz.gestureAnalysis.EventCaller;
+import edu.pkusz.gestureAnalysis.Mode;
+
 public class ControlFrame  {
+	private EventCaller caller;
 	private Point pointScreen;	// 鼠标在屏幕的位置
 	private MouseLocThread mouseLocThread;
 	private static int modeId = 0;		//模式号id
@@ -74,6 +78,9 @@ public class ControlFrame  {
 		frame.setUndecorated(true);
 		frame.setAlwaysOnTop(true);
 		frame.setOpacity(0.8f);
+		frame.setAlwaysOnTop(true);//设置窗体总在最顶层
+		frame.setFocusableWindowState(false);
+		frame.setVisible(false);
 		//初始化Mode图片
 		 iconModeSmall[0] = new ImageIcon("PicResource\\mouseSmall.png");
 		 iconModeBig[0] = new ImageIcon("PicResource\\mouseBig.png");
@@ -89,7 +96,7 @@ public class ControlFrame  {
 		 }
 		Container contMenu = frame.getContentPane();
 		contMenu.add(panelMenu);
-		frame.setVisible(true);	
+		//frame.setVisible(true);	
 		
 		//Draw面板
 		frameDraw = new JFrame();
@@ -117,7 +124,13 @@ public class ControlFrame  {
 		 }
 		Container contDraw = frameDraw.getContentPane();
 		contDraw.add(panelDraw);
-		frameDraw.setVisible(true);	
+		frameDraw.setAlwaysOnTop(true);//设置窗体总在最顶层
+		frameDraw.setFocusableWindowState(false);
+		frameDraw.setVisible(false);	
+	}
+	public void startFrame(){
+		frame.setVisible(true);
+		frameDraw.setVisible(true);
 	}
 	public void addButtonListener(){
 		//循环为buttonMode添加响应，进入和离开
@@ -138,9 +151,20 @@ public class ControlFrame  {
 							buttonModeArray[i].setIcon(iconModeBig[i]);
 						else
 							buttonModeArray[i].setIcon(iconModeSmall[i]);
-
 					}
 					setMode(index);
+					if(index==0){
+						caller.callEvent(Mode.EndFigure);
+						caller.callEvent(Mode.EndMagnifier);
+					}
+					else if(index==1){
+						caller.callEvent(Mode.EndFigure);
+						caller.callEvent(Mode.StartMagnifier);
+					}
+					else if(index==2){
+						caller.callEvent(Mode.EndMagnifier);
+						caller.callEvent(Mode.StartFigure);
+					}
 		//			System.out.println("enter Modebutton" + index);
 				}
 			});
@@ -220,14 +244,17 @@ public class ControlFrame  {
 					}	 
 				}
 		}	
-	public  ControlFrame(){
+	public  ControlFrame( EventCaller caller){
+		this.caller = caller;
 		initMenu();
 		addButtonListener();
 		//开线程mouseLocThread
 		mouseLocThread = new MouseLocThread();
 		new Thread(mouseLocThread).start();
 	}
+	
 	public static void main(String args[]){
-		ControlFrame controlFrame = new ControlFrame();
+		ControlFrame controlFrame = new ControlFrame(new EventCaller());
+		controlFrame.startFrame();
 	}
 }
