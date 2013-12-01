@@ -122,6 +122,10 @@ class MouseRoundPanel extends JPanel
 	    graphics.drawOval(60-radius/2, 60-radius/2, radius, radius);
     }
     public int setRadius(int r){
+    	if(r>=maxRadius)
+    		this.setVisible(false);
+    	else
+    		this.setVisible(true);
     	if(r<=maxRadius && r>=minRadius)
     		radius = r;  
     	repaint();

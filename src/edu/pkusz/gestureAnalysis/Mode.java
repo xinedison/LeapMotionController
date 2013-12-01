@@ -16,8 +16,8 @@ package edu.pkusz.gestureAnalysis;
  * 12:magnifier move
  * 13:magnifier resize
  * 14:magnifier zoom
- * 15:figureModeStart
- * 16:figureModeEnd
+ * 15:up hand   (start figure or change music volume)
+ * 16:down hand(end figure or change music volume)
  * 17:drawPoint	
 */
 public class Mode {
@@ -36,9 +36,10 @@ public class Mode {
 	public static final int MagnifierMove = 12;
 	public static final int MagnifierResize = 13;
 	public static final int MagnifierZoom = 14;
-	public static final int StartFigure = 15;
-	public static final int EndFigure = 16;
+	public static final int UpHand = 15;
+	public static final int DownHand = 16;
 	public static final int DrawPoint = 17; 
+	public static final int Music = 18;
 	public static int getModeByIndex(int index){
 		switch(index){
 		case 0:return  Nothing;
@@ -56,9 +57,10 @@ public class Mode {
 		case 12:return MagnifierMove;
 		case 13:return MagnifierResize;
 		case 14:return MagnifierZoom;
-		case 15:return StartFigure;
-		case 16:return EndFigure;
+		case 15:return UpHand;
+		case 16:return DownHand;
 		case 17:return DrawPoint;	
+		case 18:return Music;
 		default :return Nothing;
 		}
 	}

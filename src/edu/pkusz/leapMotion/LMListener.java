@@ -74,6 +74,10 @@ public class LMListener extends Listener {
         Frame frame = controller.frame();
         if(frame.fingers().count()==0){//当前如果没有检测到手指的话，将之前检测到的一系列动作分析为一个连贯动作，找出意图实施
         	this.mode = gesAnalyser.getBestMode();
+        	if(this.mode == Mode.StartMagnifier)
+        		controlFrame.setModeFocus(1);
+        	else if(this.mode == Mode.UpHand)
+        		controlFrame.setModeFocus(2);
         	if(this.mode==Mode.MagnifierZoom){//如果为特殊的Mode,则需要设置参数
         		this.magState = gesAnalyser.getMagZoomState();
         		caller.setMagState(magState);
@@ -112,6 +116,13 @@ public class LMListener extends Listener {
 	        	caller.setMagState(magState);
 	        	if(magState!=MagnifierState.Nothing)//需要调整缩放比例
 	        		caller.callEvent(this.mode);
+	        }
+	        else if(tempmode == Mode.UpHand||tempmode==Mode.DownHand){
+	        	this.mode = tempmode;
+	        	int tempCallerMode = caller.getMode();
+	        	if(tempCallerMode==Mode.Music)
+	        		caller.callEvent(this.mode);
+	        	gesAnalyser.setMode(Mode.Nothing);
 	        }
         }
     }

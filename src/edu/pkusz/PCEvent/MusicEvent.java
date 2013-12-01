@@ -27,6 +27,7 @@ public class MusicEvent extends JFrame{
 //	private int windowHeight = 300;
 	private BackgroundPanel backgroundPanel = new BackgroundPanel();
 	private Container container = getContentPane();	
+	private float volume = 0.2f;
 	
 	public static void main(String[] args){
 		try {
@@ -38,7 +39,7 @@ public class MusicEvent extends JFrame{
 			Thread.sleep(5000);
 			musicEvent.endMusic();
 			Thread.sleep(5000);
-			musicEvent.startMusic();
+//			musicEvent.startMusic();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -80,7 +81,7 @@ public class MusicEvent extends JFrame{
 		return true;
 	}
 	public boolean playMusic(){
-		musicfile = new File("MusicResource\\01.mp3"); 
+		musicfile = new File("MusicResource\\01.wav"); 
 		try { 
 			if(state == 2){
 				player.start();
@@ -97,6 +98,7 @@ public class MusicEvent extends JFrame{
 					System.out.println("music file error");
 			}
 			player.start();// ¿ªÊ¼²¥·Å 
+			setVolumeUp();
 			state = 1;
 		}catch (Exception e) { 
 			e.getStackTrace(); 
@@ -113,9 +115,36 @@ public class MusicEvent extends JFrame{
 	}
 	public boolean setVolume(double volume){
 		if(state==0)
-			return false;
-
+			return false;		
+		if(volume<0.2f)
+			volume = 0.2f;
+		if(volume>0.6f)
+			volume = 0.6f;
+		this.volume = (float)volume;
 		player.getGainControl().setLevel((float)volume);
+		return true;
+	}
+	public boolean setVolumeUp(){
+		if(state==0)
+			return false;
+		volume+=0.01f;
+		if(volume<0.2f)
+			volume = 0.2f;
+		if(volume>0.6f)
+			volume = 0.6f;
+		System.out.println(volume);
+		player.getGainControl().setLevel(volume);
+		return true;
+	}
+	public boolean setVolumeDown(){
+		if(state==0)
+			return false;
+		volume-=0.01f;
+		if(volume<0.2f)
+			volume = 0.2f;
+		if(volume>0.6f)
+			volume = 0.6f;
+		player.getGainControl().setLevel(volume);
 		return true;
 	}
 	public boolean nextBackground(){

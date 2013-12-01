@@ -11,6 +11,9 @@ public class PCControler {
 	private MusicEvent musicEvent = new MusicEvent();
 	private int delaytime = 10;
 	private int mode = 0;	//mode = 0 鼠标模式   mode = 1 放大镜模式   mode = 2 画图模式 mode = 3音乐模式
+	private boolean drawOver = true;
+	private int  lastX=0;
+	private int  lastY = 0;
 	
 	public static void main(String[] args){
 		PCControler pcControler = new PCControler();
@@ -95,7 +98,7 @@ public class PCControler {
 			for(int i =0;i<1500;i++){
 				Thread.sleep(10);
 				pcControler.drawPoint(java.awt.MouseInfo.getPointerInfo().getLocation().x, 
-						 			  java.awt.MouseInfo.getPointerInfo().getLocation().y,1);
+						 			  java.awt.MouseInfo.getPointerInfo().getLocation().y,1,0);
 			}
 			pcControler.endFigure();
 			Thread.sleep(2000);
@@ -263,13 +266,46 @@ public class PCControler {
 		drawFigureEvent.endFigure();
 		return true;
 	}
-	public boolean drawPoint(int x,int y,int drawState){	//在x,y坐标处画点 
+	public boolean drawPoint(int x,int y,int drawState,int drawMode){	//在x,y坐标处画点 
 		if(mode != 2) return false;
-		int lastX = java.awt.MouseInfo.getPointerInfo().getLocation().x;
-		int lastY = java.awt.MouseInfo.getPointerInfo().getLocation().y;
+		
+		if(drawOver){
+			lastX = java.awt.MouseInfo.getPointerInfo().getLocation().x;
+			lastY = java.awt.MouseInfo.getPointerInfo().getLocation().y;
+		}
 		drawFigureEvent.mouseMove(x, y);
-		if(drawState==1)
-			drawFigureEvent.drawPoint(lastX,lastY);
+		if(drawState==1){
+			if(drawMode == 0)
+				drawFigureEvent.drawPoint(lastX,lastY);
+			else if(drawMode==1){
+				if(drawOver){
+					drawFigureEvent.drawLine(lastX,lastY);
+					drawOver=false;
+				}
+				else
+					drawFigureEvent.setLine(lastX,lastY);
+			}
+			else if(drawMode==2){
+				if(drawOver){
+					drawFigureEvent.drawRec(lastX,lastY);
+					drawOver=false;
+				}
+				else
+					drawFigureEvent.setRec(lastX,lastY);
+			}
+			else if(drawMode==3){
+				if(drawOver){
+					drawFigureEvent.drawOval(lastX,lastY);
+					drawOver=false;
+				}
+				else
+					drawFigureEvent.setOval(lastX,lastY);
+			}
+		}
+		else{
+			//if(!drawOver)
+				drawOver = true;
+		}
 		return true;
 	}
 	
@@ -304,6 +340,16 @@ public class PCControler {
 	public boolean setMusicVolume(double volume){
 		if(mode != 3) return false;
 		musicEvent.setVolume(volume);
+		return true;
+	}
+	public boolean musicVolumeUp(){
+		if(mode != 3) return false;
+		musicEvent.setVolumeUp();
+		return true;
+	}
+	public boolean musicVolumeDown(){
+		if(mode != 3) return false;
+		musicEvent.setVolumeDown();
 		return true;
 	}
 }

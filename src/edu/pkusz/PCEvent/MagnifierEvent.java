@@ -72,6 +72,8 @@ public class MagnifierEvent extends JFrame{
 		return true;		
 	}
 	public void update(){
+		if(!startMag)
+			return;
 		if(magnifierPanel.judgeDiff()){
 			this.setVisible(false);
 			magnifierPanel.delay(10);

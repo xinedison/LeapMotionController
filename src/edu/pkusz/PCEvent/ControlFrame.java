@@ -102,7 +102,8 @@ public class ControlFrame  {
 		frameDraw = new JFrame();
 		JPanel panelDraw = new JPanel();
 		panelDraw.setLayout(new GridLayout(1,4,0,0));
-		frameDraw.setLocation(860,1);
+		frameDraw.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2-frameDrawWidth/2, -frameDrawHeight+5);
+		
 		frameDraw.setSize(frameDrawWidth, frameDrawHeight);
 		frameDraw.setUndecorated(true);
 		frameDraw.setAlwaysOnTop(true);
@@ -140,8 +141,7 @@ public class ControlFrame  {
 				@Override//鼠标离开button,设置无背景
 				public void mouseExited(MouseEvent e) {
 					// TODO Auto-generated method stub
-	//				buttonModeArray[index].setIcon(iconModeSmall[index]);
-			//		System.out.println("leave Modebutton"+index);
+
 				}
 				@Override//鼠标进入button，图标变大，设置modeId
 				public void mouseEntered(MouseEvent e) {
@@ -154,16 +154,16 @@ public class ControlFrame  {
 					}
 					setMode(index);
 					if(index==0){
-						caller.callEvent(Mode.EndFigure);
+						caller.callEvent(Mode.DownHand);
 						caller.callEvent(Mode.EndMagnifier);
 					}
 					else if(index==1){
-						caller.callEvent(Mode.EndFigure);
+						caller.callEvent(Mode.DownHand);
 						caller.callEvent(Mode.StartMagnifier);
 					}
 					else if(index==2){
 						caller.callEvent(Mode.EndMagnifier);
-						caller.callEvent(Mode.StartFigure);
+						caller.callEvent(Mode.UpHand);
 					}
 		//			System.out.println("enter Modebutton" + index);
 				}
@@ -189,6 +189,7 @@ public class ControlFrame  {
 
 					}
 					setDraw(index);
+					caller.setDrawMode(index);
 			//		System.out.println("enter Drawbutton" + index);
 				}
 			});
@@ -196,6 +197,9 @@ public class ControlFrame  {
 	}
 	
 	//刷新操作，若鼠标靠近屏幕左侧，菜单出现；反之隐藏
+		/**
+		 * 
+		 */
 		public void updateFrame(){
 			pointScreen = MouseInfo.getPointerInfo().getLocation();
 			//Menu隐藏
@@ -204,29 +208,25 @@ public class ControlFrame  {
 				//return;
 			}
 			else{
-				try{															//frame延时消失
-					System.out.println("going to sleep");
-	//				Thread.sleep(1000);
-	               }catch(Exception e){
-	                   e.printStackTrace();
-	                }
 				frame.setLocation(-frameWidth+5, java.awt.Toolkit.getDefaultToolkit().getScreenSize().height/2-frameHeight/2);
+//				try{															//frame延时消失
+//					Thread.sleep(1000);
+//	               }catch(Exception e){
+//	                   e.printStackTrace();
+//	             }
 			}
 			//Draw面板隐藏
 			if(modeId == 2 && pointScreen.y < frameDrawHeight)
 				frameDraw.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2-frameDrawWidth/2,1);
 			else{
-				try{															//frame延时消失
-					System.out.println("going to sleep");
-		//			Thread.sleep(1000);
-		               }catch(Exception e){
-		                   e.printStackTrace();
-		                }
 					frameDraw.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2-frameDrawWidth/2, -frameDrawHeight+5);
+//					try {
+//						Thread.sleep(1000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 			}
-			System.out.println("Hello,java"+"modeId="+modeId);
-			System.out.println("Hello,java"+"DrawId="+drawId);
-			
 		}	
 	//内部类 mouseThread
 		class  MouseLocThread implements Runnable{
@@ -248,11 +248,31 @@ public class ControlFrame  {
 		this.caller = caller;
 		initMenu();
 		addButtonListener();
+		setModeFocus(0);
+		setDrawFocus(0);
 		//开线程mouseLocThread
 		mouseLocThread = new MouseLocThread();
 		new Thread(mouseLocThread).start();
 	}
-	
+	public void setModeFocus(int index){
+		for(int i = 0;i < buttonModeNum;i++){
+			if(i == index)
+				buttonModeArray[i].setIcon(iconModeBig[i]);
+			else
+				buttonModeArray[i].setIcon(iconModeSmall[i]);
+		}
+		setMode(index);
+	}
+	public void setDrawFocus(int index){
+		for(int i = 0;i < buttonDrawNum;i++){
+			if(i == index)
+				buttonDrawArray[i].setIcon(iconDrawBig[i]);
+			else
+				buttonDrawArray[i].setIcon(iconDrawSmall[i]);
+		}
+		setDraw(index);
+	}
+
 	public static void main(String args[]){
 		ControlFrame controlFrame = new ControlFrame(new EventCaller());
 		controlFrame.startFrame();

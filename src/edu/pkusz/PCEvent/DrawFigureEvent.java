@@ -106,6 +106,26 @@ public class DrawFigureEvent extends JFrame{
 		validate();    // 更新所有子控件
 		return true;
 	}
+	public boolean drawLine(int x1,int y1){
+		if(!startFig)
+			return false;
+		figurePanel.drawLine(x1, y1, 
+												 java.awt.MouseInfo.getPointerInfo().getLocation().x,
+												 java.awt.MouseInfo.getPointerInfo().getLocation().y,
+												 color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
+	public boolean setLine(int x1,int y1){
+		if(!startFig)
+			return false;
+		figurePanel.setLine(x1, y1, 
+												 java.awt.MouseInfo.getPointerInfo().getLocation().x,
+												 java.awt.MouseInfo.getPointerInfo().getLocation().y ,
+												 color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
 	public boolean drawLine(int x1,int y1, int x2,int y2){
 		if(!startFig)
 			return false;
@@ -113,10 +133,50 @@ public class DrawFigureEvent extends JFrame{
 		validate();    // 更新所有子控件
 		return true;
 	}
+	public boolean drawRec(int x1,int y1){
+		if(!startFig)
+			return false;
+		figurePanel.drawRec(x1, y1,
+												java.awt.MouseInfo.getPointerInfo().getLocation().x - x1,
+												java.awt.MouseInfo.getPointerInfo().getLocation().y - y1,
+												color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
+	public boolean setRec(int x1,int y1){
+		if(!startFig)
+			return false;
+		figurePanel.setRec(x1,	y1,
+											java.awt.MouseInfo.getPointerInfo().getLocation().x-x1,
+											java.awt.MouseInfo.getPointerInfo().getLocation().y-y1,
+											color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
 	public boolean drawRec(int x1,int y1, int x2,int y2){
 		if(!startFig)
 			return false;
 		figurePanel.drawRec(x1, y1, x2, y2,color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
+	public boolean drawOval(int x,int y){
+		if(!startFig)
+			return false;
+		figurePanel.drawOval(x, y, 
+												 java.awt.MouseInfo.getPointerInfo().getLocation().x - x,
+												 java.awt.MouseInfo.getPointerInfo().getLocation().y - y,
+												 color,stroke);
+		validate();    // 更新所有子控件
+		return true;
+	}
+	public boolean setOval(int x,int y){
+		if(!startFig)
+			return false;
+		figurePanel.setOval(x, y, 
+											 java.awt.MouseInfo.getPointerInfo().getLocation().x - x,
+											 java.awt.MouseInfo.getPointerInfo().getLocation().y - y,
+											 color,stroke);
 		validate();    // 更新所有子控件
 		return true;
 	}
@@ -193,11 +253,29 @@ class FigurePanel extends JPanel
     	vLine.add(new FigureLineInfo(x1,y1,x2,y2,color,stroke));
     	repaint();	//重画控件
     }
+    public void setLine(int x1,int y1, int x2,int y2,Color color,float stroke){
+    	if(!vLine.isEmpty())
+    		vLine.remove(vLine.size()-1);
+    	vLine.add(new FigureLineInfo(x1,y1,x2,y2,color,stroke));
+    	repaint();	//重画控件
+    }
     public void drawRec(int x,int y, int width,int height,Color color,float stroke){
     	vRec.add(new FigureRecInfo(x,y,width,height,color,stroke));
     	repaint();	//重画控件
     }
+    public void setRec(int x,int y, int width,int height,Color color,float stroke){
+    	if(!vRec.isEmpty())
+    		vRec.remove(vRec.size()-1);
+    	vRec.add(new FigureRecInfo(x,y,width,height,color,stroke));
+    	repaint();	//重画控件
+    }
     public void drawOval(int x,int y, int width,int height,Color color,float stroke){
+    	vOval.add(new FigureOvalInfo(x,y,width,height,color,stroke));
+    	repaint();	//重画控件
+    }
+    public void setOval(int x,int y, int width,int height,Color color,float stroke){
+    	if(!vOval.isEmpty())
+    		vOval.remove(vOval.size()-1);
     	vOval.add(new FigureOvalInfo(x,y,width,height,color,stroke));
     	repaint();	//重画控件
     }

@@ -23,7 +23,7 @@ import com.leapmotion.leap.Vector;
 
 public class GestureAnalyser {
 	private int mode;
-	private int modeNum = 17;
+	private int modeNum = 19;
 	private int[] modeIndex = new int[modeNum];
 
 	/*
@@ -45,6 +45,7 @@ public class GestureAnalyser {
 	 * 15:figureModeStart
 	 * 16:figureModeEnd
 	 * 17:drawPoint	
+	 * 18:music
 	*/
 	private double fingerSpeedX = 0f;			//descripe the single finger position
 	private double fingerSpeedY = 0f;
@@ -136,13 +137,18 @@ public class GestureAnalyser {
 		if(hands.count()==2){//分析两只手完成的动作
 			Hand leftHand = hands.leftmost();
 			Hand rightHand = hands.rightmost();
-			int judgeV = 20;
+			int judgeV = 200;
 			if(leftHand.fingers().count()==1&&leftHand.fingers().count()==rightHand.fingers().count()){//由两只手分别各出一个手指的动作
-				if(leftHand.palmVelocity().getX()>judgeV&&rightHand.palmVelocity().getX()<-judgeV){//两手横向合并，认为是关闭放大镜
-					this.modeIndex[Mode.EndMagnifier]++;
+				Finger leftFinger = leftHand.fingers().get(0);
+				Finger rightFinger = rightHand.fingers().get(0);
+				if(leftFinger.tipVelocity().getX()>judgeV&&rightFinger.tipVelocity().getX()<-judgeV){//两手横向合并，认为是关闭放大镜
+					this.modeIndex[Mode.EndMagnifier]+=2;
 				}
-				else if(leftHand.palmVelocity().getX()<-judgeV&&rightHand.palmVelocity().getX()>judgeV){//两手横向分开，认为是打开放大镜
+				else if(leftFinger.tipVelocity().getX()<-judgeV&&rightFinger.tipVelocity().getX()>judgeV){//两手横向分开，认为是打开放大镜
 					this.modeIndex[Mode.StartMagnifier]++;
+				}
+				if(leftFinger.tipPosition().getZ()<-50&&rightFinger.tipPosition().getZ()<-50){//两指一戳，打开音乐
+					this.modeIndex[Mode.Music] ++;
 				}
 			}
 			else if(leftHand.fingers().count()>=3&&rightHand.fingers().count()>=3){//由两只张开手完成的动作，认为是调整放大镜大小
@@ -289,12 +295,12 @@ public class GestureAnalyser {
 					this.mode = Mode.Nothing;
 					break;
 				case up:
-					this.modeIndex[Mode.StartFigure]++;
-					this.mode = Mode.Nothing;
+					this.modeIndex[Mode.UpHand]++;
+					this.mode = Mode.UpHand;
 					break;
 				case down:
-					this.modeIndex[Mode.EndFigure]++;
-					this.mode = Mode.Nothing;
+					this.modeIndex[Mode.DownHand]++;
+					this.mode = Mode.DownHand;
 					break;
 //				case leftOut:
 //					this.modeIndex[Mode.PageDown]++;

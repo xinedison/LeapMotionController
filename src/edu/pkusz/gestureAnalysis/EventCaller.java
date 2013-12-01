@@ -11,6 +11,8 @@ public class EventCaller {
 	private MouseState state;
 	private MagnifierState magState;
 	private DrawState drawState = DrawState.Nothing;
+	private int drawMode = 0;	//0画点 1画line 2画rec 3画oval 
+	private boolean musicStart = false;
 	private int x;
 	private int y;
 	private int z;
@@ -33,13 +35,19 @@ public class EventCaller {
 		}
 		return true;
 	}
+	public void setMode(int mode){
+		this.mode = mode;
+	}
+	public int getMode(){
+		return mode;
+	}
 	/**
 	 * 根据mode的不同来完成pc调用
 	 * @param mode 指示手势信息
 	 * @return 
 	 */
 	public boolean callEvent(int mode){
-		this.mode = mode;
+//		this.mode = mode;
 		boolean bSucceed = false;
 		switch(mode){
 		case Mode.StartShow  :
@@ -60,7 +68,7 @@ public class EventCaller {
 			break;
 		case Mode.MouseMove:
 			bSucceed = pcControler.mouseMove(x/20,- y/20);
-			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState());
+			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState(),drawMode);
 			pcControler.moveMagnifier(x/20, -y/20);
 			pcControler.setRound(z);
 			break;
@@ -70,20 +78,24 @@ public class EventCaller {
 		case Mode.LeftClk:
 			bSucceed = pcControler.leftClick();
 			break;
-		case Mode.StartFigure:
+		case Mode.UpHand:
+			bSucceed = pcControler.musicVolumeUp();
 			bSucceed = pcControler.startFigure();
-			System.out.println("start figure");
+//			bSucceed = pcControler.zoomMagnifier(0.1);
 			break;
-		case Mode.EndFigure:
+		case Mode.DownHand:
 			bSucceed = pcControler.endFigure();
-			System.out.println("end figure");
+			bSucceed = pcControler.musicVolumeDown();
+//			bSucceed = pcControler.zoomMagnifier(-0.1);
 			break;
 		case Mode.StartMagnifier:
 			bSucceed = pcControler.startMagnifier();
+			pcControler.startBackground();
 			System.out.println("start magnifier");
 			break;
 		case Mode.EndMagnifier:
 			bSucceed = pcControler.endMagnifier();
+			pcControler.endBackground();
 			System.out.println("end magnifier");
 			break;
 		case Mode.MagnifierResize:
@@ -96,6 +108,20 @@ public class EventCaller {
 		case Mode.MouseModeStart:
 			bSucceed = pcControler.startMouse();
 			System.out.println("mouse mode start");
+			break;
+		case Mode.Music:
+			if(musicStart){
+				setMode(Mode.Nothing);
+				musicStart = false;
+				bSucceed = pcControler.endMusic();
+				System.out.println("music end");
+			}
+			else{
+				setMode(Mode.Music);
+				musicStart = true;
+				bSucceed = pcControler.startMusic();
+				System.out.println("music start");
+			}
 			break;
 		default :break;
 		}
@@ -114,5 +140,9 @@ public class EventCaller {
 	}
 	public void setMagState(MagnifierState magState){
 		this.magState = magState;
+	}
+	public void setDrawMode(int mode){
+		drawMode = mode;
+		System.out.println(drawMode);
 	}
 }
