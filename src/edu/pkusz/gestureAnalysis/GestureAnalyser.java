@@ -167,15 +167,15 @@ public class GestureAnalyser {
 					if(farToScreenFinger.id()!=frontFinger.id())
 						break;
 				}
-				int judgeV = 20;
-				if(frontFinger.tipVelocity().getZ()>judgeV&&farToScreenFinger.tipVelocity().getZ()<-judgeV){
-					this.magStateCache += MagnifierState.Shrink.getState();
-					this.modeIndex[Mode.MagnifierZoom]++;
-				}
-				else if(frontFinger.tipVelocity().getZ()<-judgeV&&farToScreenFinger.tipVelocity().getZ()>judgeV){
-					this.magStateCache += MagnifierState.Enlarge.getState();
-					this.modeIndex[Mode.MagnifierZoom]++;
-				}
+//				int judgeV = 20;
+//				if(frontFinger.tipVelocity().getZ()>judgeV&&farToScreenFinger.tipVelocity().getZ()<-judgeV){
+//					this.magStateCache += MagnifierState.Shrink.getState();
+//					this.modeIndex[Mode.MagnifierZoom]++;
+//				}
+//				else if(frontFinger.tipVelocity().getZ()<-judgeV&&farToScreenFinger.tipVelocity().getZ()>judgeV){
+//					this.magStateCache += MagnifierState.Enlarge.getState();
+//					this.modeIndex[Mode.MagnifierZoom]++;
+//				}
 			}
 			else if(hands.get(0).fingers().count()>=4){//单手握拳或分开
 				Hand curHand = hands.get(0);

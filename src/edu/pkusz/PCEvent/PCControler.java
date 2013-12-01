@@ -212,11 +212,14 @@ public class PCControler {
 	* 			Enlarge Screen			 * 
 	*************************************/
 	public boolean startMagnifier(){	//开始放大镜模式，mode=1 
-		if(mode == 1) return false;
-		mode = 1;
-		magnifierEvent.startMagnifier();
-		mouseRound.endRound();
-		return true;
+//		if(mode == 1 ) return false;
+		if(mode == 0){
+			mode = 1;
+			magnifierEvent.startMagnifier();
+			mouseRound.endRound();
+			return true;
+		}
+		return false;
 	}
 	public boolean endMagnifier(){		//结束放大镜模式，开始鼠标控制模式，mode=0 
 		if(mode != 1) return false;
@@ -245,10 +248,13 @@ public class PCControler {
 	* 			Draw Figure				 * 
 	*************************************/	
 	public boolean startFigure(){		//开始画图模式，mode=2 
-		if(mode == 2) return false;
-		mode = 2;
-		drawFigureEvent.startFigure();
-		return true;
+//		if(mode == 2) return false;
+		if(mode == 0){
+			mode = 2;
+			drawFigureEvent.startFigure();
+			return true;
+		}
+		return false;
 	}
 	public boolean endFigure(){			//结束画图模式，开始鼠标控制模式，mode=0 
 		if(mode != 2) return false;
