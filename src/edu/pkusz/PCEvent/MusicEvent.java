@@ -132,7 +132,6 @@ public class MusicEvent extends JFrame{
 			volume = 0.2f;
 		if(volume>0.6f)
 			volume = 0.6f;
-		System.out.println(volume);
 		player.getGainControl().setLevel(volume);
 		return true;
 	}

@@ -9,6 +9,7 @@ import com.leapmotion.leap.Gesture;
 import com.leapmotion.leap.Listener;
 
 import edu.pkusz.PCEvent.ControlFrame;
+import edu.pkusz.PCEvent.PCControler;
 import edu.pkusz.gestureAnalysis.DrawState;
 import edu.pkusz.gestureAnalysis.EventCaller;
 import edu.pkusz.gestureAnalysis.GestureAnalyser;
@@ -57,6 +58,7 @@ public class LMListener extends Listener {
     public void onDisconnect(Controller controller) {
         //Note: not dispatched when running in a debugger.
         System.out.println("Disconnected");
+        System.exit(0);
     }
 
     public void onExit(Controller controller) {
@@ -133,9 +135,9 @@ public class LMListener extends Listener {
 		controlFrame = new ControlFrame(listener.caller);
 		controlFrame.startFrame();
 		controller.addListener(listener);
-		
 		 try {
 	            System.in.read();
+	            System.exit(0);
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
