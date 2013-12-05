@@ -74,7 +74,7 @@ public class LMListener extends Listener {
         Frame frame = controller.frame();
         if(frame.fingers().count()==0){//当前如果没有检测到手指的话，将之前检测到的一系列动作分析为一个连贯动作，找出意图实施
         	this.mode = gesAnalyser.getBestMode();
-        	if(this.mode == Mode.StartMagnifier)
+        	if(this.mode == Mode.TwoFingerAway)
         		controlFrame.setModeFocus(1);
         	else if(this.mode == Mode.UpHand)
         		controlFrame.setModeFocus(2);
@@ -87,7 +87,7 @@ public class LMListener extends Listener {
         	caller.callEvent(this.mode);
     	}else{	//如果有手指信息的话，分析当前帧，同时设置实时响应数据
 	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
-	        if(tempmode == Mode.MouseMove){//如果是鼠标移动的话，实时响应
+	        if(tempmode == Mode.FingerMove){//如果是鼠标移动的话，实时响应
 	        	this.mode = tempmode;
 	        	double x = gesAnalyser.getSpeedX();
 	        	double y = gesAnalyser.getSpeedY();
@@ -108,7 +108,7 @@ public class LMListener extends Listener {
 	        		caller.callMouseState(mouseState);
 	        	}
 	        }
-	        else if(tempmode == Mode.MagnifierResize){//如果是调整放大镜缩放大小，实时响应
+	        else if(tempmode == Mode.TwoHandAway){//如果是调整放大镜缩放大小，实时响应
 	        	this.mode = tempmode;
 	        	this.magState = gesAnalyser.getMagState();
 	        	double handsDis = gesAnalyser.getHandsDistance();
@@ -120,7 +120,7 @@ public class LMListener extends Listener {
 	        else if(tempmode == Mode.UpHand||tempmode==Mode.DownHand){
 	        	this.mode = tempmode;
 	        	int tempCallerMode = caller.getMode();
-	        	if(tempCallerMode==Mode.Music)
+	        	if(tempCallerMode==Mode.TwoFingerPoke)
 	        		caller.callEvent(this.mode);
 	        	gesAnalyser.setMode(Mode.Nothing);
 	        }

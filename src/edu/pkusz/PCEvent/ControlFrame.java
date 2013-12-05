@@ -155,14 +155,14 @@ public class ControlFrame  {
 					setMode(index);
 					if(index==0){
 						caller.callEvent(Mode.DownHand);
-						caller.callEvent(Mode.EndMagnifier);
+						caller.callEvent(Mode.TwoFingerApproach);
 					}
 					else if(index==1){
 						caller.callEvent(Mode.DownHand);
-						caller.callEvent(Mode.StartMagnifier);
+						caller.callEvent(Mode.TwoFingerAway);
 					}
 					else if(index==2){
-						caller.callEvent(Mode.EndMagnifier);
+						caller.callEvent(Mode.TwoFingerApproach);
 						caller.callEvent(Mode.UpHand);
 					}
 		//			System.out.println("enter Modebutton" + index);

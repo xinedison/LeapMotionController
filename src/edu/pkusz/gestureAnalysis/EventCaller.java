@@ -50,23 +50,23 @@ public class EventCaller {
 //		this.mode = mode;
 		boolean bSucceed = false;
 		switch(mode){
-		case Mode.StartShow  :
+		case Mode.StretchHand  :
 			bSucceed = pcControler.startShow();
 			System.out.println("start show");
 			break;
-		case Mode.EndShow:
+		case Mode.CloseHand:
 			bSucceed = pcControler.endShow();
 			System.out.println("end show");
 			break;
-		case Mode.PageDown:
+		case Mode.HandLeft:
 			bSucceed = pcControler.pageDown();
 			System.out.println("pagedown");
 			break;
-		case Mode.PageUp:
+		case Mode.HandRight:
 			bSucceed = pcControler.pageUp();
 			System.out.println("pageup");
 			break;
-		case Mode.MouseMove:
+		case Mode.FingerMove:
 			bSucceed = pcControler.mouseMove(x/20,- y/20);
 			pcControler.drawPoint(x/20,- y/20,drawState.getDrawState(),drawMode);
 			pcControler.moveMagnifier(x/20, -y/20);
@@ -88,17 +88,17 @@ public class EventCaller {
 			bSucceed = pcControler.musicVolumeDown();
 //			bSucceed = pcControler.zoomMagnifier(-0.1);
 			break;
-		case Mode.StartMagnifier:
+		case Mode.TwoFingerAway:
 			bSucceed = pcControler.startMagnifier();
 			pcControler.startBackground();
 			System.out.println("start magnifier");
 			break;
-		case Mode.EndMagnifier:
+		case Mode.TwoFingerApproach:
 			bSucceed = pcControler.endMagnifier();
 			pcControler.endBackground();
 			System.out.println("end magnifier");
 			break;
-		case Mode.MagnifierResize:
+		case Mode.TwoHandAway:
 			bSucceed = pcControler.resizeMagnifier(magState.getState()*magResize/50);
 			break;
 		case Mode.MagnifierZoom:
@@ -109,7 +109,7 @@ public class EventCaller {
 			bSucceed = pcControler.startMouse();
 			System.out.println("mouse mode start");
 			break;
-		case Mode.Music:
+		case Mode.TwoFingerPoke:
 			if(musicStart){
 				setMode(Mode.Nothing);
 				musicStart = false;
@@ -117,7 +117,7 @@ public class EventCaller {
 				System.out.println("music end");
 			}
 			else{
-				setMode(Mode.Music);
+				setMode(Mode.TwoFingerPoke);
 				musicStart = true;
 				bSucceed = pcControler.startMusic();
 				System.out.println("music start");
