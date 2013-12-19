@@ -1,6 +1,5 @@
 package edu.pkusz.PCEvent;
 import java.awt.AWTException;
-import java.awt.BasicStroke;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -8,7 +7,6 @@ import java.awt.Image;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.io.File; 
-import java.util.Vector;
 
 import javax.media.Manager; 
 import javax.media.MediaLocator; 

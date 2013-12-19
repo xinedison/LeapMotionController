@@ -98,7 +98,7 @@ public class EventCaller {
 			pcControler.endBackground();
 			System.out.println("end magnifier");
 			break;
-		case Mode.TwoHandAway:
+		case Mode.TwoHandMove:
 			bSucceed = pcControler.resizeMagnifier(magState.getState()*magResize/50);
 			break;
 		case Mode.MagnifierZoom:

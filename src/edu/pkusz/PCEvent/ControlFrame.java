@@ -140,11 +140,32 @@ public class ControlFrame  {
 				private int index = buttonIndex;
 				@Override//鼠标离开button,设置无背景
 				public void mouseExited(MouseEvent e) {
-					// TODO Auto-generated method stub
-
 				}
 				@Override//鼠标进入button，图标变大，设置modeId
 				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					if(index!=0) return;
+					for(int i = 0;i < buttonModeNum;i++){
+						if(i == index && index == 0)
+							buttonModeArray[i].setIcon(iconModeBig[i]);
+						else
+							buttonModeArray[i].setIcon(iconModeSmall[i]);
+					}
+					setMode(index);
+					if(index==0){
+						caller.callEvent(Mode.DownHand);
+						caller.callEvent(Mode.TwoFingerApproach);
+					}
+					else if(index==1){
+						caller.callEvent(Mode.DownHand);
+						caller.callEvent(Mode.TwoFingerAway);
+					}
+					else if(index==2){
+						caller.callEvent(Mode.TwoFingerApproach);
+						caller.callEvent(Mode.UpHand);
+					}
+				}
+				public void mouseClicked(MouseEvent e) {
 					// TODO Auto-generated method stub
 					for(int i = 0;i < buttonModeNum;i++){
 						if(i == index)
@@ -152,7 +173,8 @@ public class ControlFrame  {
 						else
 							buttonModeArray[i].setIcon(iconModeSmall[i]);
 					}
-					setMode(index);
+					if(index == 1 || index == 2)
+						setMode(index);
 					if(index==0){
 						caller.callEvent(Mode.DownHand);
 						caller.callEvent(Mode.TwoFingerApproach);
@@ -186,7 +208,6 @@ public class ControlFrame  {
 							buttonDrawArray[i].setIcon(iconDrawBig[i]);
 						else
 							buttonDrawArray[i].setIcon(iconDrawSmall[i]);
-
 					}
 					setDraw(index);
 					caller.setDrawMode(index);
@@ -209,23 +230,12 @@ public class ControlFrame  {
 			}
 			else{
 				frame.setLocation(-frameWidth+5, java.awt.Toolkit.getDefaultToolkit().getScreenSize().height/2-frameHeight/2);
-//				try{															//frame延时消失
-//					Thread.sleep(1000);
-//	               }catch(Exception e){
-//	                   e.printStackTrace();
-//	             }
 			}
 			//Draw面板隐藏
 			if(modeId == 2 && pointScreen.y < frameDrawHeight)
 				frameDraw.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2-frameDrawWidth/2,1);
 			else{
 					frameDraw.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2-frameDrawWidth/2, -frameDrawHeight+5);
-//					try {
-//						Thread.sleep(1000);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
 			}
 		}	
 	//内部类 mouseThread
@@ -273,8 +283,8 @@ public class ControlFrame  {
 		setDraw(index);
 	}
 
-	public static void main(String args[]){
-		ControlFrame controlFrame = new ControlFrame(new EventCaller());
-		controlFrame.startFrame();
-	}
+//	public static void main(String args[]){
+//		ControlFrame controlFrame = new ControlFrame(new EventCaller());
+//		controlFrame.startFrame();
+//	}
 }

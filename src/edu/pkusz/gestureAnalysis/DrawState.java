@@ -6,7 +6,7 @@ package edu.pkusz.gestureAnalysis;
  * 2:draw rec
  */
 public enum DrawState {
-	Nothing(0),DrawPoint(1),DrawRec(2);
+	Nothing(0),DrawPoint(1),DrawSet(2),DrawFinish(3);
 	private int drawState;
 	private DrawState(int state){
 		this.drawState = state;

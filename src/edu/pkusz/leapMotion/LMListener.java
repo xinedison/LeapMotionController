@@ -49,9 +49,9 @@ public class LMListener extends Listener {
     public void onConnect(Controller controller) {
         System.out.println("Connected");
         controller.enableGesture(Gesture.Type.TYPE_SWIPE);
-        controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
+//        controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
         controller.enableGesture(Gesture.Type.TYPE_SCREEN_TAP);
-        controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
+//        controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
         this.gesAnalyser = new GestureAnalyser(controller);
     }
 
@@ -78,8 +78,10 @@ public class LMListener extends Listener {
         	this.mode = gesAnalyser.getBestMode();
         	if(this.mode == Mode.TwoFingerAway)
         		controlFrame.setModeFocus(1);
-        	else if(this.mode == Mode.UpHand)
+        	else if(this.mode == Mode.UpHand){
         		controlFrame.setModeFocus(2);
+        		gesAnalyser.clearDrawState();
+        	}
         	if(this.mode==Mode.MagnifierZoom){//如果为特殊的Mode,则需要设置参数
         		this.magState = gesAnalyser.getMagZoomState();
         		caller.setMagState(magState);
@@ -91,8 +93,8 @@ public class LMListener extends Listener {
 	        int tempmode = gesAnalyser.analyseFrame(frame);	//分析mode
 	        if(tempmode == Mode.FingerMove){//如果是鼠标移动的话，实时响应
 	        	this.mode = tempmode;
-	        	double x = gesAnalyser.getSpeedX();
-	        	double y = gesAnalyser.getSpeedY();
+	        	double x = gesAnalyser.getSpeedX()*4/3;
+	        	double y = gesAnalyser.getSpeedY()*2;
 	    		if((int)(preParaX*10) ==(int)(x*10))
 	    			x = 0;
 	    		else
@@ -110,7 +112,7 @@ public class LMListener extends Listener {
 	        		caller.callMouseState(mouseState);
 	        	}
 	        }
-	        else if(tempmode == Mode.TwoHandAway){//如果是调整放大镜缩放大小，实时响应
+	        else if(tempmode == Mode.TwoHandMove){//如果是调整放大镜缩放大小，实时响应
 	        	this.mode = tempmode;
 	        	this.magState = gesAnalyser.getMagState();
 	        	double handsDis = gesAnalyser.getHandsDistance();
@@ -135,12 +137,12 @@ public class LMListener extends Listener {
 		controlFrame = new ControlFrame(listener.caller);
 		controlFrame.startFrame();
 		controller.addListener(listener);
-		 try {
-	            System.in.read();
-	            System.exit(0);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
+		try {
+			System.in.read();
+	        System.exit(0);
+	     }catch (IOException e) {
+			 e.printStackTrace();
+	     }
         controller.removeListener(listener);
 	}
 }

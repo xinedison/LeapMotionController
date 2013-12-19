@@ -274,10 +274,10 @@ public class PCControler {
 			lastY = java.awt.MouseInfo.getPointerInfo().getLocation().y;
 		}
 		drawFigureEvent.mouseMove(x, y);
-		if(drawState==1){
-			if(drawMode == 0)
-				drawFigureEvent.drawPoint(lastX,lastY);
-			else if(drawMode==1){
+		if(drawMode == 0 && (drawState==1||drawState==3))
+			drawFigureEvent.drawPoint(lastX,lastY);
+		if(drawState==1 || drawState==2){
+			if(drawMode==1){
 				if(drawOver){
 					drawFigureEvent.drawLine(lastX,lastY);
 					drawOver=false;
